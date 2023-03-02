@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var productHelper=require('../helpers/product-helpers')
+var productHelpers=require('../helpers/product-helpers')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -38,8 +38,19 @@ router.get('/create-profile', function(req, res, next){
 })
 
 router.post('/create-profile', (req,res)=>{
-  console.log(req.body)
-  console.log(req.files.image)
+productHelpers.addProfile(req.body,(insertedId)=>{
+  let image=req.files.image
+     
+  image.mv('./public/profile-images/'+insertedId+'.jpg',(err,done)=>{
+    
+    if(!err){
+      res.redirect('/')
+    }else{
+      console.log(err)
+    }
+  })
+  
+})
 })
 
 module.exports = router;
