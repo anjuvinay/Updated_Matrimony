@@ -13,15 +13,15 @@
     </tr>
   </thead>
   <tbody>
-    {{#each person}}
+    {{#each profiles}}
     <tr>     
       <th scope="row">{{@index}}</th>
-      <td><img style="width: 50px; height: 50px;" src="{{this.image}}" alt=""></td>
-      <td>{{this.name}}</td>
+      <td><img style="width: 50px; height: 50px;" src="/profile-images/{{this._id}}.jpg" alt=""></td>
+      <td>{{this.Name}}</td>
       <td>{{this.age}}</td>
       <td>{{this.religion}}</td>
        <td>{{this.job}}</td>
-      <td>{{this.place}}</td>
+      <td>{{this.location}}</td>
       
     </tr>
     {{/each}}
