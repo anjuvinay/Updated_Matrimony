@@ -1,6 +1,7 @@
 <section>
     <div class="container">
-        <table class="table mt-5">
+      <div class="row mt-4"></div>
+        <table class="table mt-5" id="profilesTable">
   <thead>
     <tr>
       <th scope="col">No</th>
@@ -22,6 +23,13 @@
       <td>{{this.religion}}</td>
        <td>{{this.job}}</td>
       <td>{{this.location}}</td>
+      <td>
+          {{#if_equal this.status "Verified"}}
+          <a href="/admin/verify-status/{{this._id}}" class="btn btn-info" >Verified</a>
+          {{else}}
+          <a href="/admin/verify-status/{{this._id}}" class="btn btn-info" >Verify</a>
+          {{/if_equal}}
+       </td>
       
     </tr>
     {{/each}}
@@ -30,3 +38,9 @@
 </table>
     </div>
 </section>
+
+<script>
+  $(function(){
+    $('#profilesTable').DataTable()
+  })
+</script>

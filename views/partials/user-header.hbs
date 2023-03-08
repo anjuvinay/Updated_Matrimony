@@ -8,8 +8,9 @@
   <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
-        <a class="nav-link" href="#">Profiles <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="/">Profiles <span class="sr-only">(current)</span></a>
       </li>
+      {{#if user}}
       <li class="nav-item active">
         <a class="nav-link" href="#">Messages</a>
       </li>
@@ -19,24 +20,25 @@
       <li class="nav-item active">
         <a class="nav-link" href="/create-profile">Create Profile</a>
       </li>
+      {{/if}}
     </ul>
       <div class="dropdown">
   <button class="btn btn-secondary dropdown-toggle mr-5" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{!-- {{#if user}}
+    {{#if user}}
     {{user.Name}}
     {{else}}
     Account
-    {{/if}} --}}
+    {{/if}} 
     
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    {{!-- {{#if user}} --}}
+    {{#if user}}
     
      <a class="dropdown-item" href="">My Profile</a>
-     <a class="dropdown-item" href="">Logout</a>
-    {{!-- {{else}} --}}
+     <a class="dropdown-item" href="/logout">Logout</a>
+    {{else}}
      <a class="dropdown-item" href="/login">Login</a>
-    {{!-- {{/if}} --}}
+    {{/if}}
    
   </div>
 </div>

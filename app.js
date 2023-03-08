@@ -11,11 +11,20 @@ var hbs=require('express-handlebars')
 var app = express();
 var fileUpload=require('express-fileupload')
 var db=require('./config/connection')
+var session=require('express-session')
+app.engine('hbs',hbs.engine({extname:'hbs',   helpers: {if_equal: function(a, b, opts) {
+  if (a == b) {
+      return opts.fn(this)
+  } else {
+      return opts.inverse(this)
+  }
+}}, 
+defaultLayout:'layout',layoutsDir:__dirname+'/views/layout/',partialsDir:__dirname+'/views/partials/'}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
-app.engine('hbs',hbs.engine({extname:'hbs',defaultLayout:'layout',layoutsDir:__dirname+'/views/layout/',partialsDir:__dirname+'/views/partials/',runtimeOptions:{allowProtoPropertiesByDefault:true,},}))
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -23,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload())
+app.use(session({secret:"Key",cookie:{maxAge:600000}}))
 
 db.connect((err)=>{
   if(err) console.log("connection Error"+err)
