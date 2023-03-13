@@ -1,0 +1,72 @@
+<section>
+    <div class="container mt-5">
+        <form action="" id="checkout-form">
+            <div class="row">
+                 <div class="col-md-4">
+                   <br>
+                    <div>
+                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top" alt="...">
+                    </div>
+                    <br>
+                    <div>
+                        <img style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
+                   
+                        <img style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top pl-1" alt="...">
+                    </div>
+                </div> 
+
+                <div class="col-md-4">
+                    <div class="container mt-3 ml-5 checkout">
+                        <hr>
+                        <h6>Name: {{profile.Name}} </h6>
+                        <hr>
+                        <h6>Age: {{profile.age}}</h6>
+                        <hr>
+                        <h6>Date of Birth: {{profile.DOB}} </h6>
+                        <hr>
+                        <h6>Gender: {{profile.gender}} </h6>
+                        <hr> 
+                        <h6>Height: {{profile.height}} </h6>
+                        <hr>
+                        <h6>Weight: {{profile.weight}} </h6>
+                        <hr> 
+                        <h6>Complexion: {{profile.complexion}} </h6>
+                        <hr>
+                        <h6>Physical Status: {{profile.physical}} </h6>
+                        <hr>                         
+                        </div>
+                </div>
+
+                        <div class="col-md-4">
+                    <div class="container mt-3 ml-5 checkout">
+                        <hr>
+                        <h6>Mother Tongue: {{profile.language}} </h6>
+                        <hr>
+                        <h6>Location: {{profile.location}} </h6>
+                        <hr> 
+                        <h6>Marital Status: {{profile.marital}} </h6>
+                        <hr> 
+                        <h6>Diet: {{profile.diet}} </h6>
+                        <hr>
+                        <h6>Religion: {{profile.religion}} </h6>
+                        <hr> 
+                        <h6>Education: {{profile.Education}} </h6>
+                        <hr> 
+                        <h6>Job: {{profile.job}} </h6>
+                        <hr>
+                        <h6>Mobile: {{profile.mobile}} </h6>
+                        <hr>   
+                          <a href="/send-intrest/{{profile._id}}" class="btn btn-primary mr-4">Send Intrest</a>
+                          <a href="/send-message/{{profile._id}}" class="btn btn-primary">Send Message</a>        
+                         <br><br><br>
+                        </div>
+
+                    </div>
+                </div>
+
+                
+            </div>
+
+        </form>
+    </div>
+</section>

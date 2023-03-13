@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var productHelpers=require('../helpers/product-helpers')
+var profileHelpers=require('../helpers/profile-helpers')
 const userHelpers=require('../helpers/user-helpers')
 const adminHelpers=require('../helpers/admin-helpers')
 
@@ -15,7 +15,7 @@ const verifyLogiin = (req, res, next)=>{
 /* GET users listing. */
 router.get('/',verifyLogiin, function(req, res, next) { 
   let Admin=req.session.admin
-  productHelpers.getAllProfiles().then((profiles)=>{
+  profileHelpers.getAllProfiles().then((profiles)=>{
     res.render('admin/view-profiles',{admin:true,Admin, profiles});
   }) 
 });
@@ -61,6 +61,13 @@ router.get('/sign-up', function(req, res){
     req.session.admin=null
     req.session.adminLoggedIn=false
     res.redirect('/admin/log-in')
+  })
+
+  router.get('/verify-status/:id',(req,res)=>{
+    adminHelpers.verifiedStatus(req.params.id).then(()=>{
+      console.log(req.params.id)
+      res.redirect('/admin')
+    })
   })
   
 
