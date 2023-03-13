@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var profileHelpers=require('../helpers/profile-helpers')
 const userHelpers=require('../helpers/user-helpers')
-const adminHelpers=require('../helpers/admin-helpers')
+const adminHelpers=require('../helpers/admin-helpers');
+const { response } = require('express');
 
 const verifyLogin = (req, res, next)=>{
   if(req.session.user){
@@ -106,6 +107,13 @@ router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
     res.render('user/send-intrest',{profiles,user})
   })
  
+})
+
+router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
+  let user=req.session.user
+  profileHelpers.delete_intrest(req.params.id).then((response)=>{
+    res.redirect('/interest')
+  })  
 })
 
 module.exports = router;

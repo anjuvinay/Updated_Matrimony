@@ -1,5 +1,6 @@
 var db=require('../config/connection')
 var collection=require('../config/collections')
+const { response } = require('express')
 var ObjectId = require('mongodb').ObjectId
 
 
@@ -40,7 +41,7 @@ module.exports={
             let item =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
          db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(item)
 
-         let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().toArray()
+         let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().sort({_id:-1}).toArray()
          resolve(profiles)
         
         })
@@ -51,6 +52,14 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
             let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().toArray()
          resolve(profiles)
+        })
+    },
+
+    delete_intrest:(proId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.INTEREST_SEND_COLLECTION).deleteOne({_id:ObjectId(proId)}).then((response)=>{
+                resolve(response)
+            })
         })
     }
 
