@@ -15,11 +15,12 @@
         <a class="nav-link" href="#">Messages</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/interest">Interests</a>
+        <a class="nav-link" href="/interest">Interests <span class="badge badge-success" id="interest-count">{{interestCount}}</span></a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="/create-profile">Create Profile</a>
       </li>
+      
       {{/if}}
     </ul>
       <div class="dropdown">
@@ -34,7 +35,8 @@
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     {{#if user}}
     
-     <a class="dropdown-item" href="">My Profile</a>
+     <a class="dropdown-item" href="/my-profile">My Profile</a>
+      <a class="dropdown-item" href="/create-my-profile">create my Profile</a>
      <a class="dropdown-item" href="/logout">Logout</a>
     {{else}}
      <a class="dropdown-item" href="/login">Login</a>

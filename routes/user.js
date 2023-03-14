@@ -14,10 +14,14 @@ const verifyLogin = (req, res, next)=>{
 }
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
   let user=req.session.user
+  let interestCount=null
+  
+    interestCount=await profileHelpers.interest_count()
+  
  profileHelpers.getVerifiedProfiles().then((profiles)=>{
-  res.render('user/view-profiles', {profiles,user});
+  res.render('user/view-profiles', {profiles,user,interestCount});
  })
   
 });
@@ -115,5 +119,38 @@ router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
     res.redirect('/interest')
   })  
 })
+
+router.get('/create-my-profile', function(req, res, next){
+  let user=req.session.user
+  res.render('user/add-my-profile', {admin:false, user});
+})
+
+router.post('/create-my-profile',verifyLogin, (req,res)=>{
+profileHelpers.addMyProfile(req.body,(insertedId)=>{
+  let image1=req.files.image1
+  let image2=req.files.image2
+  let image3=req.files.image3
+
+  image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
+  image2.mv('./public/profile-images/'+insertedId+2+'.jpg') 
+  image1.mv('./public/profile-images/'+insertedId+1+'.jpg',(err,done)=>{
+    
+    if(!err){
+      res.redirect('/my-profile')
+    }else{
+      console.log(err)
+    }
+  })
+  
+})
+})
+
+router.get('/my-profile',(req,res,next)=>{
+  let user=req.session.user
+  profileHelpers.my_detailed_profile().then((profile)=>{
+  res.render('user/my-profile', {profile,admin:false, user}) 
+  }) 
+})
+
 
 module.exports = router;

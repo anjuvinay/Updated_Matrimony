@@ -13,6 +13,12 @@ module.exports={
 
     },
 
+    addMyProfile:(details, callback)=>{
+        db.get().collection(collection.MYPROFILE_COLLECTION).insertOne(details).then((data)=>{
+            callback(data.insertedId)
+        })
+    },
+
     getAllProfiles:()=>{
         return new Promise(async(resolve, reject)=>{
             let profiles=await db.get().collection(collection.PROFILE_COLLECTION).find().toArray()
@@ -36,12 +42,21 @@ module.exports={
         })
     },
 
+    my_detailed_profile:()=>{
+        return new Promise(async(resolve,reject)=>{
+            let profile=await db.get().collection(collection.MYPROFILE_COLLECTION).findOne()
+            console.log(profile)
+            resolve(profile)
+        })
+
+    },
+
     intrest_send:(proId)=>{
         return new Promise(async(resolve,reject)=>{
             let item =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
          db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(item)
 
-         let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().sort({_id:-1}).toArray()
+         let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().sort({_id:-1}).toArray() 
          resolve(profiles)
         
         })
@@ -52,6 +67,15 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
             let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().toArray()
          resolve(profiles)
+        })
+    },
+
+    interest_count:()=>{
+        return new Promise(async(resolve,reject)=>{
+            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().toArray()
+            let count=0
+            count=profiles.length
+         resolve(count)
         })
     },
 
