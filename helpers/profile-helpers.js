@@ -26,13 +26,21 @@ module.exports={
         })
     },
 
+    // getVerifiedProfiles:()=>{
+    //     return new Promise(async(resolve,reject)=>{
+    //         let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
+    //         .find({status:"Verified"}).toArray()
+    //         resolve(VerifiedProfiles)
+    //     })
+    // },
+
     getVerifiedProfiles:()=>{
-        return new Promise(async(resolve,reject)=>{
-            let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
-            .find({status:"Verified"}).toArray()
-            resolve(VerifiedProfiles)
-        })
-    },
+             return new Promise(async(resolve,reject)=>{
+                 let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
+                .find({religion:{$nin:["Hindu"]},status:"Verified"}).toArray()
+                 resolve(VerifiedProfiles)
+             })
+         },
 
     detailed_profile:(proId)=>{
         return new Promise(async(resolve,reject)=>{
@@ -42,9 +50,9 @@ module.exports={
         })
     },
 
-    my_detailed_profile:()=>{
+    my_detailed_profile:(email)=>{
         return new Promise(async(resolve,reject)=>{
-            let profile=await db.get().collection(collection.MYPROFILE_COLLECTION).findOne()
+            let profile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
             console.log(profile)
             resolve(profile)
         })

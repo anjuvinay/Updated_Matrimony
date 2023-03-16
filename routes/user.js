@@ -66,6 +66,9 @@ router.get('/signup',(req,res)=>{
 router.post('/signup',(req,res)=>{
   userHelpers.doSignup(req.body).then((response)=>{
     console.log(response)
+    req.session.user=response
+    req.session.user.loggedIn=true
+    res.redirect('/')
   })
   
 })
@@ -75,6 +78,7 @@ router.post('/login',(req, res)=>{
     if(response.status){ 
       req.session.user=response.user
       req.session.user.loggedIn=true
+      console.log(req.session.user)
       res.redirect('/')
     }else{
       req.session.loginErr="Invalid username or Password"
@@ -120,34 +124,11 @@ router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
   })  
 })
 
-router.get('/create-my-profile', function(req, res, next){
+
+router.get('/my-profile',verifyLogin,(req,res,next)=>{
   let user=req.session.user
-  res.render('user/add-my-profile', {admin:false, user});
-})
-
-router.post('/create-my-profile',verifyLogin, (req,res)=>{
-profileHelpers.addMyProfile(req.body,(insertedId)=>{
-  let image1=req.files.image1
-  let image2=req.files.image2
-  let image3=req.files.image3
-
-  image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
-  image2.mv('./public/profile-images/'+insertedId+2+'.jpg') 
-  image1.mv('./public/profile-images/'+insertedId+1+'.jpg',(err,done)=>{
+  profileHelpers.my_detailed_profile(user.Email).then((profile)=>{
     
-    if(!err){
-      res.redirect('/my-profile')
-    }else{
-      console.log(err)
-    }
-  })
-  
-})
-})
-
-router.get('/my-profile',(req,res,next)=>{
-  let user=req.session.user
-  profileHelpers.my_detailed_profile().then((profile)=>{
   res.render('user/my-profile', {profile,admin:false, user}) 
   }) 
 })
