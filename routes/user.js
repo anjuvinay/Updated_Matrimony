@@ -14,13 +14,13 @@ const verifyLogin = (req, res, next)=>{
 }
 
 /* GET home page. */
-router.get('/', async function(req, res, next) {
+router.get('/',verifyLogin, async function(req, res, next) {
   let user=req.session.user
   let interestCount=null
   
     interestCount=await profileHelpers.interest_count()
   
- profileHelpers.getVerifiedProfiles().then((profiles)=>{
+ profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
   res.render('user/view-profiles', {profiles,user,interestCount});
  })
   

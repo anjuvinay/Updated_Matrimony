@@ -26,19 +26,19 @@ module.exports={
         })
     },
 
-    // getVerifiedProfiles:()=>{
-    //     return new Promise(async(resolve,reject)=>{
-    //         let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
-    //         .find({status:"Verified"}).toArray()
-    //         resolve(VerifiedProfiles)
-    //     })
-    // },
-
-    getVerifiedProfiles:()=>{
+    getVerifiedProfiles:(user)=>{
+        console.log(user)
              return new Promise(async(resolve,reject)=>{
+                if(user.Gender=="Male"){
+                    let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
+                    .find({email:{$nin:[user.Email]},status:"Verified",gender:"Female"}).toArray()
+                     resolve(VerifiedProfiles)
+
+                }else{
                  let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
-                .find({religion:{$nin:["Hindu"]},status:"Verified"}).toArray()
+                .find({email:{$nin:[user.Email]},status:"Verified",gender:"Male"}).toArray()
                  resolve(VerifiedProfiles)
+                }
              })
          },
 
