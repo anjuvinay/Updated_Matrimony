@@ -62,8 +62,8 @@
                         <hr>
                         <h6>Mobile: {{profile.mobile}} </h6>
                         <hr>   
-                          <a href="/send-intrest/{{profile._id}}" class="btn btn-primary mr-4">Edit</a>
-                          <a href="/send-message/{{profile._id}}" class="btn btn-primary">Delete</a>        
+                          <a href="/edit-profile/{{profile._id}}" class="btn btn-primary mr-4">Edit</a>
+                          <a href="/delete-profile/{{profile._id}}" class="btn btn-primary" onclick="return confirm('Do you want to delete your profile {{profile.Name}}')">Delete</a>        
                          <br><br><br>
                         </div>
 

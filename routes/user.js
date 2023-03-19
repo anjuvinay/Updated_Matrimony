@@ -127,10 +127,47 @@ router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
 
 router.get('/my-profile',verifyLogin,(req,res,next)=>{
   let user=req.session.user
-  profileHelpers.my_detailed_profile(user.Email).then((profile)=>{
-    
+  profileHelpers.my_detailed_profile(user.Email).then((profile)=>{  
   res.render('user/my-profile', {profile,admin:false, user}) 
   }) 
+})
+
+router.get('/edit-profile/:id',async(req,res)=>{
+  let user=req.session.user
+  let profile = await profileHelpers.myProfileDetails(req.params.id)
+  console.log(profile)
+  res.render('user/edit-profile',{profile,admin:false,user})
+})
+
+router.post('/edit-profile/:id',(req,res)=>{
+  let insertedId=req.params.id
+  profileHelpers.updateProfile(req.params.id, req.body).then(()=>{
+    res.redirect('/my-profile')
+
+    if(req.files.image1){
+      
+      let image1=req.files.image1
+      image1.mv('./public/profile-images/'+insertedId+1+'.jpg') 
+    }
+    if(req.files.image2){
+      let image2=req.files.image2
+      image2.mv('./public/profile-images/'+insertedId+2+'.jpg')
+    }
+    if(req.files.image3){
+      let image3=req.files.image3 
+      image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
+    }
+
+  })
+  
+})
+
+router.get('/delete-profile/:id',(req,res)=>{
+  let proId=req.params.id
+  profileHelpers.deleteProfile(proId).then((response)=>{
+    res.redirect('/')
+  })
+ 
 })
 
 

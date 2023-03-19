@@ -93,6 +93,52 @@ module.exports={
                 resolve(response)
             })
         })
-    }
+    },
+
+    myProfileDetails:(proId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)}).then((profile)=>{
+                resolve(profile)
+            })
+        })
+    },
+
+    updateProfile:(proId, proDetails)=>{
+        return new Promise((resolve, reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).
+            updateOne({_id:ObjectId(proId)},{
+                $set:{
+                    Name:proDetails.Name,
+                    age:proDetails.age,
+                    gender:proDetails.gender,
+                    DOB:proDetails.DOB,
+                    height:proDetails.height,
+                    weight:proDetails.weight,
+                    complexion:proDetails.complexion,
+                    physical:proDetails.physical,
+                    language:proDetails.language,
+                    location:proDetails.location,
+                    marital:proDetails.marital,
+                    diet:proDetails.diet,
+                    religion:proDetails.religion,
+                    caste:proDetails.caste,
+                    Education:proDetails.Education,
+                    job:proDetails.job,
+                    mobile:proDetails.mobile,
+                    email:proDetails.email
+                }
+            }).then((response)=>{
+                resolve()
+            })
+        })
+    },
+
+    deleteProfile:(prodId)=>{
+        return new Promise((resolve, reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).deleteOne({_id:ObjectId(prodId)}).then((response)=>{
+                resolve(response)
+            })
+        })
+    },
 
 }
