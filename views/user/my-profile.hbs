@@ -5,15 +5,41 @@
             <div class="row">
                  <div class="col-md-4">
                    <br>
+                    {{#if_equal profile.flag "image2"}}
                     <div>
-                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top" alt="...">
+                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top" alt="...">
                     </div>
                     <br>
                     <div>
-                        <img style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
+                        <img onclick="changeImage1('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top " alt="...">
                    
-                        <img style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top pl-1" alt="...">
+                        <img onclick="changeImage3('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top pl-1" alt="...">
                     </div>
+                    {{/if_equal}}
+                    {{#if_equal profile.flag "image3"}}
+                     <div>
+                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top" alt="...">
+                    </div>
+                    <br>
+                    <div>
+                        <img onclick="changeImage2('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
+                   
+                        <img onclick="changeImage1('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top pl-1" alt="...">
+                    </div>
+                    {{/if_equal}}
+                    {{#if_equal profile.flag "image1"}}
+                    <div>
+                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top" alt="...">
+                    </div>
+                   
+                    <br>
+                    <div>
+                        <img onclick="changeImage2('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
+                   
+                        <img onclick="changeImage3('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top pl-1" alt="...">
+                    </div>
+                     {{/if_equal}}
+                    
                 </div> 
 
                 <div class="col-md-4">
@@ -76,3 +102,43 @@
         </form>
     </div>
 </section>
+
+<script>
+    function changeImage2(proId){
+    $.ajax({
+        url:'/change-image2/'+proId,
+        method:'get',
+        success:(Response)=>{
+            if(Response){
+              location.reload()
+            }          
+        }
+    })
+}
+
+function changeImage3(proId){
+    $.ajax({
+        url:'/change-image3/'+proId,
+        method:'get',
+        success:(Response)=>{
+            if(Response){
+              location.reload()
+            }          
+        }
+    })
+}
+
+function changeImage1(proId){
+    $.ajax({
+        url:'/change-image1/'+proId,
+        method:'get',
+        success:(Response)=>{
+            if(Response){
+              location.reload()
+            }          
+        }
+    })
+}
+
+</script>
+

@@ -16,11 +16,11 @@ const verifyLogin = (req, res, next)=>{
 /* GET home page. */
 router.get('/',verifyLogin, async function(req, res, next) {
   let user=req.session.user
-  let interestCount=null
-  
+  let interestCount=null 
     interestCount=await profileHelpers.interest_count()
   
  profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
+ 
   res.render('user/view-profiles', {profiles,user,interestCount});
  })
   
@@ -168,6 +168,24 @@ router.get('/delete-profile/:id',(req,res)=>{
     res.redirect('/')
   })
  
+})
+
+router.get('/change-image2/:id',verifyLogin, (req,res)=>{
+  profileHelpers.imageStatus(req.params.id).then(()=>{
+   res.json(response)
+  }) 
+})
+
+router.get('/change-image3/:id',verifyLogin, (req,res)=>{
+  profileHelpers.imageStatus3(req.params.id).then(()=>{
+   res.json(response)
+  }) 
+})
+
+router.get('/change-image1/:id',verifyLogin, (req,res)=>{
+  profileHelpers.imageStatus1(req.params.id).then(()=>{
+   res.json(response)
+  }) 
 })
 
 

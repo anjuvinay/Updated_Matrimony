@@ -29,6 +29,7 @@ module.exports={
     getVerifiedProfiles:(user)=>{
         console.log(user)
              return new Promise(async(resolve,reject)=>{
+
                 if(user.Gender=="Male"){
                     let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
                     .find({email:{$nin:[user.Email]},status:"Verified",gender:"Female"}).toArray()
@@ -44,6 +45,12 @@ module.exports={
 
     detailed_profile:(proId)=>{
         return new Promise(async(resolve,reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            {
+                $set:{
+                    flag:"image1"
+                }
+            })
             let item =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
                 resolve(item)
             
@@ -52,6 +59,12 @@ module.exports={
 
     my_detailed_profile:(email)=>{
         return new Promise(async(resolve,reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({email:email},
+            {
+                $set:{
+                    flag:"image1"
+                }
+            })
             let profile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
             console.log(profile)
             resolve(profile)
@@ -140,5 +153,44 @@ module.exports={
             })
         })
     },
+
+    imageStatus:(proId)=>{
+        return new Promise((resolve, reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            {
+                $set:{
+                    flag:"image2"
+                }
+            }).then(()=>{
+                resolve()
+            })
+        })
+    },
+
+    imageStatus3:(proId)=>{
+        return new Promise((resolve, reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            {
+                $set:{
+                    flag:"image3"
+                }
+            }).then(()=>{
+                resolve()
+            })
+        })
+    },
+
+    imageStatus1:(proId)=>{
+        return new Promise((resolve, reject)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            {
+                $set:{
+                    flag:"image1"
+                }
+            }).then(()=>{
+                resolve()
+            })
+        })
+    }
 
 }
