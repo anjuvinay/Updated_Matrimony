@@ -17,7 +17,7 @@ const verifyLogin = (req, res, next)=>{
 router.get('/',verifyLogin, async function(req, res, next) {
   let user=req.session.user
   let interestCount=null 
-    interestCount=await profileHelpers.interest_count(req.session.user._id)
+    interestCount=await profileHelpers.interest_count(user.Email)
   
  profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
  
@@ -100,7 +100,7 @@ router.get('/view-profile/:id',verifyLogin, (req,res)=>{
 
 })
 
-router.get('/interest', verifyLogin, (req,res)=>{
+router.get('/send-interest-button', verifyLogin, (req,res)=>{
   let user=req.session.user
   profileHelpers.intrest(req.session.user._id).then((profiles)=>{
     res.render('user/send-intrest',{profiles,user})
@@ -108,13 +108,31 @@ router.get('/interest', verifyLogin, (req,res)=>{
 
 })
 
-router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
+router.get('/interest', verifyLogin, (req,res)=>{
   let user=req.session.user
-  profileHelpers.intrest_send(req.params.id, req.session.user._id).then((profiles)=>{
-    res.render('user/send-intrest',{profiles,user})
+  profileHelpers.interest_received(user.Email).then((profiles)=>{
+    res.render('user/received-interest',{profiles,user})
+    })
+
   })
- 
-})
+
+  router.get('/received-interest',verifyLogin, (req,res)=>{
+    let user=req.session.user
+    profileHelpers.interest_received(user.Email).then((profiles)=>{
+      res.render('user/received-intrest',{profiles,user})
+    })
+  
+  })
+  
+
+  router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
+    let user=req.session.user
+    profileHelpers.intrest_send(req.params.id, req.session.user._id, user.Email).then((profiles)=>{
+      res.render('user/send-intrest',{profiles,user})
+    })
+   
+  })
+  
 
 router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
   let user=req.session.user

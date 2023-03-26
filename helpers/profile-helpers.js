@@ -72,20 +72,30 @@ module.exports={
 
     },
 
-    intrest_send:(proId, userId)=>{
+    intrest_send:(proId, userId, email)=>{
         return new Promise(async(resolve, reject)=>{
-            let profile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
 
-            db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(profile)
+            let sendProfile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+
+            db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).insertOne(userProfile)
+
+            db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(sendProfile)
+
+            db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:ObjectId(userProfile._id)},
+            {
+                $push:{
+                    To:ObjectId(proId),      
+                      }
+            }
+                )
       
             db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
             {
                 $push:{
-                    To:proId,
                     From:userId
-                     }
+                      }
             }
-           
                 )
      let totalProfiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION)
             .find({From:(userId)}).sort({_id:-1}).toArray()
@@ -96,16 +106,29 @@ module.exports={
 
     intrest:(userId)=>{
         return new Promise(async(resolve,reject)=>{
-            console.log(userId + " is the userId")
             let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION)
             .find({From:(userId)}).sort({_id:-1}).toArray()
          resolve(profiles)
         })
     },
 
-    interest_count:(userId)=>{
+    interest_received:(email)=>{
+        return new Promise(async(resolve,reject)=>{   
+            let user=await db.get().collection(collection.INTEREST_SEND_COLLECTION).findOne({email:email})
+             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
+             .find({To:ObjectId(user._id)}).sort({_id:-1}).toArray()
+          resolve(profiles)
+            
+        })
+
+    },
+
+    interest_count:(email)=>{
         return new Promise(async(resolve,reject)=>{
-            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find({From:(userId)}).toArray()
+            let user=await db.get().collection(collection.INTEREST_SEND_COLLECTION).findOne({email:email})
+            let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
+            .find({To:ObjectId(user._id)}).sort({_id:-1}).toArray()
+        
             let count=0
             count=profiles.length
          resolve(count)
