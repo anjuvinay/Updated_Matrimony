@@ -17,7 +17,7 @@ const verifyLogin = (req, res, next)=>{
 router.get('/',verifyLogin, async function(req, res, next) {
   let user=req.session.user
   let interestCount=null 
-    interestCount=await profileHelpers.interest_count()
+    interestCount=await profileHelpers.interest_count(req.session.user._id)
   
  profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
  
@@ -102,7 +102,7 @@ router.get('/view-profile/:id',verifyLogin, (req,res)=>{
 
 router.get('/interest', verifyLogin, (req,res)=>{
   let user=req.session.user
-  profileHelpers.intrest().then((profiles)=>{
+  profileHelpers.intrest(req.session.user._id).then((profiles)=>{
     res.render('user/send-intrest',{profiles,user})
   })
 
@@ -110,8 +110,7 @@ router.get('/interest', verifyLogin, (req,res)=>{
 
 router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
   let user=req.session.user
-  profileHelpers.intrest_send(req.params.id).then((profiles)=>{
-    console.log(profiles)
+  profileHelpers.intrest_send(req.params.id, req.session.user._id).then((profiles)=>{
     res.render('user/send-intrest',{profiles,user})
   })
  

@@ -72,28 +72,40 @@ module.exports={
 
     },
 
-    intrest_send:(proId)=>{
-        return new Promise(async(resolve,reject)=>{
-            let item =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
-         db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(item)
+    intrest_send:(proId, userId)=>{
+        return new Promise(async(resolve, reject)=>{
+            let profile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
 
-         let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().sort({_id:-1}).toArray() 
-         resolve(profiles)
-        
+            db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(profile)
+      
+            db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
+            {
+                $push:{
+                    To:proId,
+                    From:userId
+                     }
+            }
+           
+                )
+     let totalProfiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION)
+            .find({From:(userId)}).sort({_id:-1}).toArray()
+               resolve(totalProfiles)
         })
+    },
+          
 
+    intrest:(userId)=>{
+        return new Promise(async(resolve,reject)=>{
+            console.log(userId + " is the userId")
+            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION)
+            .find({From:(userId)}).sort({_id:-1}).toArray()
+         resolve(profiles)
+        })
     },
 
-    intrest:()=>{
+    interest_count:(userId)=>{
         return new Promise(async(resolve,reject)=>{
-            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().toArray()
-         resolve(profiles)
-        })
-    },
-
-    interest_count:()=>{
-        return new Promise(async(resolve,reject)=>{
-            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find().toArray()
+            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).find({From:(userId)}).toArray()
             let count=0
             count=profiles.length
          resolve(count)
