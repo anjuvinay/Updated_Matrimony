@@ -115,14 +115,6 @@ router.get('/interest', verifyLogin, (req,res)=>{
     })
 
   })
-
-  router.get('/received-interest',verifyLogin, (req,res)=>{
-    let user=req.session.user
-    profileHelpers.interest_received(user.Email).then((profiles)=>{
-      res.render('user/received-intrest',{profiles,user})
-    })
-  
-  })
   
 
   router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
@@ -136,9 +128,9 @@ router.get('/interest', verifyLogin, (req,res)=>{
 
 router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
   let user=req.session.user
-  profileHelpers.delete_intrest(req.params.id).then((response)=>{
-    res.redirect('/interest')
-  })  
+  profileHelpers.delete_intrest(req.params.id, req.session.user._id)
+    res.redirect('/send-interest-button')
+    
 })
 
 

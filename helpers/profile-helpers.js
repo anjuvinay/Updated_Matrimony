@@ -114,7 +114,7 @@ module.exports={
 
     interest_received:(email)=>{
         return new Promise(async(resolve,reject)=>{   
-            let user=await db.get().collection(collection.INTEREST_SEND_COLLECTION).findOne({email:email})
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
              let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
              .find({To:ObjectId(user._id)}).sort({_id:-1}).toArray()
           resolve(profiles)
@@ -125,9 +125,9 @@ module.exports={
 
     interest_count:(email)=>{
         return new Promise(async(resolve,reject)=>{
-            let user=await db.get().collection(collection.INTEREST_SEND_COLLECTION).findOne({email:email})
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-            .find({To:ObjectId(user._id)}).sort({_id:-1}).toArray()
+            .find({To:ObjectId(user._id)}).toArray()
         
             let count=0
             count=profiles.length
@@ -135,11 +135,16 @@ module.exports={
         })
     },
 
-    delete_intrest:(proId)=>{
+    delete_intrest:(proId, userId)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection(collection.INTEREST_SEND_COLLECTION).deleteOne({_id:ObjectId(proId)}).then((response)=>{
+            db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
+            {
+                $pull:{From:(userId)}
+            }
+            ).then((response)=>{
                 resolve(response)
             })
+                            
         })
     },
 
