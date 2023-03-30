@@ -115,22 +115,43 @@ router.get('/interest', verifyLogin, (req,res)=>{
     })
 
   })
-  
+
 
   router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
     let user=req.session.user
-    profileHelpers.intrest_send(req.params.id, req.session.user._id, user.Email).then((profiles)=>{
-      res.render('user/send-intrest',{profiles,user})
+    let proId=req.params.id
+      //  profileHelpers.intrest_send(req.params.id, req.session.user._id, user.Email)
+         res.render('user/interest-msg',{admin:false, user,proId}) 
     })
-   
+
+    
+  router.post('/int-msg', verifyLogin, (req, res)=>{
+      let user=req.session.user
+      profileHelpers.intrest_send(req.body, req.session.user._id, user.Email).then((profiles)=>{
+        console.log(profiles)
+        res.redirect('/send-interest-button')
+    })
   })
+
+  // ****************************************************************
+  
+
+  // router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
+  //   let user=req.session.user
+  //   profileHelpers.intrest_send(req.params.id, req.session.user._id, user.Email).then((profiles)=>{
+  //     res.render('user/send-intrest',{profiles,user})
+  //   })
+   
+  // })
+
+
+   // ****************************************************************
   
 
 router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
   let user=req.session.user
-  profileHelpers.delete_intrest(req.params.id, req.session.user._id)
-    res.redirect('/send-interest-button')
-    
+  profileHelpers.delete_intrest(req.params.id, req.session.user._id,user)
+    res.redirect('/send-interest-button')   
 })
 
 
@@ -196,6 +217,8 @@ router.get('/change-image1/:id',verifyLogin, (req,res)=>{
    res.json(response)
   }) 
 })
+
+
 
 
 module.exports = router;

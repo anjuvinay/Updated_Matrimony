@@ -8,7 +8,8 @@
      &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
      &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
      &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
-     <h4 align="center">Interest Received</h4>
+     <h4 class="text-center">Interest Received</h4>
+    
   </form>
 </nav>
 
@@ -16,15 +17,17 @@
 <section>
     <div class="container mt-5 ml-5">
        {{#each profiles}}
-<div class="card mb-3" style="max-width: 570px; max-height: 150px;">
+<div class="card mb-3" style="max-width: 670px; max-height: 250px;">
   <div class="row g-0">
     <div class="col-md-4">
-      <img style="width: 9rem; height: 9.3rem;" src="/profile-images/{{this._id}}1.jpg" class="img-thumbnail" alt="...">
+      <img style="width: 12rem; height: 12.3rem;" src="/profile-images/{{this._id}}1.jpg" class="img-thumbnail" alt="...">
     </div>
     <div class="col-md-8">
       <div class="card-body">
         <h5 class="card-title">{{this.Name}}</h5>
         <p class="card-text">{{this.age}} Years, {{this.religion}}, {{this.job}}, {{this.location}}</p>
+        <p class="card-text">{{this.receivedDetails.Msg}}</p>
+        <p class="card-text">Interest received on {{this.receivedDetails.Date}}</p>
         <a href="/view-profile/{{this._id}}" class="btn btn-secondary mr-4">View Profile</a>
         <a href="/cancel-intrest/{{this._id}}" class="btn btn-secondary">Accept Intrest</a>
       </div>

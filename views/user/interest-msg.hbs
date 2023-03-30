@@ -1,0 +1,23 @@
+
+<section>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="text-center pt-4">Add a message</h3>
+                <form action="/int-msg" method="post" enctype="multipart/form-data">
+
+                     
+                    <input type="hidden" name="Id" class="form-control" value={{proId}}>
+                   
+                    
+                     <label for="comment">Message:</label>
+                   <textarea class="form-control" rows="5" name="comment" id="comment"></textarea>
+
+                    
+                    <button type="submit" class="btn btn-success mt-4 float-right">Send Interest</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
