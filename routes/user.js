@@ -103,6 +103,7 @@ router.get('/view-profile/:id',verifyLogin, (req,res)=>{
 router.get('/send-interest-button', verifyLogin, (req,res)=>{
   let user=req.session.user
   profileHelpers.intrest(req.session.user._id).then((profiles)=>{
+    console.log(profiles)
     res.render('user/send-intrest',{profiles,user})
   })
 
@@ -120,7 +121,6 @@ router.get('/interest', verifyLogin, (req,res)=>{
   router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
     let user=req.session.user
     let proId=req.params.id
-      //  profileHelpers.intrest_send(req.params.id, req.session.user._id, user.Email)
          res.render('user/interest-msg',{admin:false, user,proId}) 
     })
 
@@ -128,24 +128,9 @@ router.get('/interest', verifyLogin, (req,res)=>{
   router.post('/int-msg', verifyLogin, (req, res)=>{
       let user=req.session.user
       profileHelpers.intrest_send(req.body, req.session.user._id, user.Email).then((profiles)=>{
-        console.log(profiles)
         res.redirect('/send-interest-button')
     })
   })
-
-  // ****************************************************************
-  
-
-  // router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
-  //   let user=req.session.user
-  //   profileHelpers.intrest_send(req.params.id, req.session.user._id, user.Email).then((profiles)=>{
-  //     res.render('user/send-intrest',{profiles,user})
-  //   })
-   
-  // })
-
-
-   // ****************************************************************
   
 
 router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
@@ -162,12 +147,14 @@ router.get('/my-profile',verifyLogin,(req,res,next)=>{
   }) 
 })
 
+
 router.get('/edit-profile/:id',async(req,res)=>{
   let user=req.session.user
   let profile = await profileHelpers.myProfileDetails(req.params.id)
   console.log(profile)
   res.render('user/edit-profile',{profile,admin:false,user})
 })
+
 
 router.post('/edit-profile/:id',(req,res)=>{
   let insertedId=req.params.id
@@ -192,6 +179,7 @@ router.post('/edit-profile/:id',(req,res)=>{
   
 })
 
+
 router.get('/delete-profile/:id',(req,res)=>{
   let proId=req.params.id
   profileHelpers.deleteProfile(proId).then((response)=>{
@@ -199,6 +187,7 @@ router.get('/delete-profile/:id',(req,res)=>{
   })
  
 })
+
 
 router.get('/change-image2/:id',verifyLogin, (req,res)=>{
   profileHelpers.imageStatus(req.params.id).then(()=>{

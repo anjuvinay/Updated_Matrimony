@@ -78,15 +78,16 @@ module.exports={
         return new Promise(async(resolve, reject)=>{
           let  proId=data.Id
           let reObj={
-                     To:ObjectId(proId),
-                     Msg:data.comment,
-                     Date:new Date()
+            
+                    To:ObjectId(proId),
+                    Msg:data.comment,
+                    Date:new Date()                                
                     }
 
           let sendObj={
-                        From:ObjectId(userId),
-                        Msg:data.comment,
-                        Date:new Date()
+                    From:ObjectId(userId),
+                    Msg:data.comment,
+                    Date:new Date()                        
                        }          
 
             let sendProfile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
@@ -98,26 +99,40 @@ module.exports={
 
             db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:ObjectId(userProfile._id)},
             {
-                $push:{receivedDetails:reObj}
+                 $push:{receivedDetails:reObj}
             }
                 )
       
             db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
             {
-                $push:{sendDetails:sendObj}
+                  $push:{sendDetails:sendObj}     
             }
                 )
-     let totalProfiles= db.get().collection(collection.INTEREST_SEND_COLLECTION)
-            .find({'sendDetails.From' :ObjectId(userId)}).sort({_id:-1}).toArray()
-               resolve(totalProfiles)
-        })
+
+    let totalProfiles=await db.get().collection(collection.INTEREST_SEND_COLLECTION).aggregate([
+                {
+                  $match:{'sendDetails.From' :ObjectId(userId)}
+                },
+                {
+                    $unwind:'$sendDetails'
+                }
+             ]).sort({_id:-1}).toArray()
+             
+                resolve(totalProfiles)
+         })
     },
           
 
     intrest:(userId)=>{
         return new Promise(async(resolve,reject)=>{
-            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION)
-            .find({'sendDetails.From':ObjectId(userId)}).sort({_id:-1}).toArray()
+            let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).aggregate([
+                {
+                    $match:{'sendDetails.From' :ObjectId(userId)}
+                  },
+                  {
+                      $unwind:'$sendDetails'
+                  }
+               ]).sort({_id:-1}).toArray()
          resolve(profiles)
         })
     },
@@ -125,8 +140,14 @@ module.exports={
     interest_received:(email)=>{
         return new Promise(async(resolve,reject)=>{   
             let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
-             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-             .find({'receivedDetails.To':ObjectId(user._id)}).sort({_id:-1}).toArray()
+             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).aggregate([
+             {
+                $match:{'receivedDetails.To' :ObjectId(user._id)}
+              },
+              {
+                  $unwind:'$receivedDetails'
+              }
+           ]).sort({_id:-1}).toArray()
           resolve(profiles)
             
         })
