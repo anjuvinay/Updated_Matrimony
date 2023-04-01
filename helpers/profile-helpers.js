@@ -115,6 +115,9 @@ module.exports={
                 },
                 {
                     $unwind:'$sendDetails'
+                },
+                {
+                    $match:{'sendDetails.From' :ObjectId(userId)}
                 }
              ]).sort({_id:-1}).toArray()
              
@@ -131,6 +134,9 @@ module.exports={
                   },
                   {
                       $unwind:'$sendDetails'
+                  },
+                  {
+                    $match:{'sendDetails.From' :ObjectId(userId)}
                   }
                ]).sort({_id:-1}).toArray()
          resolve(profiles)
@@ -145,8 +151,13 @@ module.exports={
                 $match:{'receivedDetails.To' :ObjectId(user._id)}
               },
               {
-                  $unwind:'$receivedDetails'
-              }
+                   $unwind:'$receivedDetails'
+                
+              },
+              {
+                $match:{'receivedDetails.To' :ObjectId(user._id)}
+              },
+
            ]).sort({_id:-1}).toArray()
           resolve(profiles)
             
