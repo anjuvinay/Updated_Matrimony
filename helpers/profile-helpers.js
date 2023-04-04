@@ -168,12 +168,19 @@ module.exports={
     interest_count:(email)=>{
         return new Promise(async(resolve,reject)=>{
             let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+            if(user){
             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
             .find({'receivedDetails.To':ObjectId(user._id)}).toArray()
-        
+
             let count=0
             count=profiles.length
-         resolve(count)
+            resolve(count)
+           }else{
+            count=0
+            resolve(count)
+
+           }
+         
         })
     },
 
@@ -225,7 +232,19 @@ module.exports={
                     Education:proDetails.Education,
                     job:proDetails.job,
                     mobile:proDetails.mobile,
-                    email:proDetails.email
+                    email:proDetails.email,
+                    ffage:proDetails.ffage,
+                    ffheight:proDetails.ffheight,
+                    ffreligion:proDetails.ffreligion,
+                    ffcaste:proDetails.ffcaste,
+                    ffcomplexion:proDetails.ffcomplexion,
+                    fflanguage:proDetails.fflanguage,
+                    ffdiet:proDetails.ffdiet,
+                    ffEducation:proDetails.ffEducation,
+                    ffjob:proDetails.ffjob,
+                    fflocation:proDetails.fflocation,
+                    ffmarital:proDetails.ffmarital,
+                    ffphysical:proDetails.ffphysical
                 }
             }).then((response)=>{
                 resolve()
