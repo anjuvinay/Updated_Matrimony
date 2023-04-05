@@ -43,6 +43,27 @@ module.exports={
              })
          },
 
+    getMatchingProfiles:(user)=>{
+        return new Promise(async(resolve,reject)=>{
+            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:user.Email})
+
+            if(user.Gender=="Male"){
+                let matchedProfiles =await db.get().collection(collection.PROFILE_COLLECTION)
+                .find({email:{$nin:[user.Email]}, age:userProfile.ffage1, height:userProfile.ffheight1,
+                religion:userProfile.ffreligion, gender:"Female"}).toArray()
+                resolve(matchedProfiles)
+
+            }else{
+               let matchedProfiles =await db.get().collection(collection.PROFILE_COLLECTION)
+               .find({email:{$nin:[user.Email]}, age:userProfile.ffage1, height:userProfile.ffheight1,
+               religion:userProfile.ffreligion, gender:"Male"}).toArray()
+               resolve(matchedProfiles)
+            }
+         })
+    },
+
+
+
     detailed_profile:(proId)=>{
         return new Promise(async(resolve,reject)=>{
             db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
@@ -233,8 +254,10 @@ module.exports={
                     job:proDetails.job,
                     mobile:proDetails.mobile,
                     email:proDetails.email,
-                    ffage:proDetails.ffage,
-                    ffheight:proDetails.ffheight,
+                    ffage1:proDetails.ffage1,
+                    ffage2:proDetails.ffage2,
+                    ffheight1:proDetails.ffheight1,
+                    ffheight2:proDetails.ffheight2,
                     ffreligion:proDetails.ffreligion,
                     ffcaste:proDetails.ffcaste,
                     ffcomplexion:proDetails.ffcomplexion,

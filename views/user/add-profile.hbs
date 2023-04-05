@@ -70,12 +70,34 @@
                     <br><br>
 
                     <h2 class="text-center">Partner Preference</h2>
+                    <br>
 
-                     <label for="">Age</label>
-                    <input type="number" name="ffage" class="form-control">
+                   
+                    <label for="">Age</label>
+                    {{!-- <input type="number" name="ffage" class="form-control"> --}}
+
+                     <div class="row">
+                     <div class="col">
+                    <input type="number" class="form-control" placeholder="Minimum Age" name="ffage1">
+                    </div>
+                    <div class="col">
+                    <input type="number" class="form-control" placeholder="Maximum Age" name="ffage2">
+                    </div>
+                    </div>
+                    <br>
+                    
 
                     <label for="">Height</label>
-                    <input type="number" step="any" name="ffheight" class="form-control">
+                    {{!-- <input type="number" step="any" name="ffheight" class="form-control "> --}}
+                    <div class="row">
+                    <div class="col">
+                    <input type="number" class="form-control" placeholder="Minimum Height" step="any" name="ffheight1">
+                    </div>
+                    <div class="col">
+                    <input type="number" class="form-control" placeholder="Maximum Height" step="any" name="ffheight2">
+                    </div>
+                    </div>
+                    <br>
 
                      <label for="">Religion</label>
                     <input type="text" name="ffreligion" class="form-control">

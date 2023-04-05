@@ -74,11 +74,34 @@
 
                     <h2 class="text-center col-md-12">Partner Preference</h2>
 
-                    <label for="">Age</label>
+                    {{!-- <label for="">Age</label>
                     <input type="number" name="ffage" class="form-control" value="{{profile.ffage}}">
 
                     <label for="">Height</label>
-                    <input type="number" step="any" name="ffheight" class="form-control" value="{{profile.ffheight}}">
+                    <input type="number" step="any" name="ffheight" class="form-control" value="{{profile.ffheight}}"> --}}
+
+                    <label for="">Age</label>
+                     <div class="row">
+                     <div class="col">
+                    <input type="number" class="form-control"  name="ffage1" value="{{profile.ffage1}}">
+                    </div>
+                    <div class="col">
+                    <input type="number" class="form-control"  name="ffage2" value="{{profile.ffage2}}">
+                    </div>
+                    </div>
+                    <br>
+                    
+
+                    <label for="">Height</label>
+                    <div class="row">
+                    <div class="col">
+                    <input type="number" class="form-control" step="any" value="{{profile.ffheight1}}" name="ffheight1">
+                    </div>
+                    <div class="col">
+                    <input type="number" class="form-control" step="any" value="{{profile.ffheight2}}" name="ffheight2">
+                    </div>
+                    </div>
+                    <br>
 
                      <label for="">Religion</label>
                     <input type="text" name="ffreligion" class="form-control" value="{{profile.ffreligion}}">

@@ -207,6 +207,13 @@ router.get('/change-image1/:id',verifyLogin, (req,res)=>{
   }) 
 })
 
+router.get('/matches', (req,res)=>{
+  let user=req.session.user
+  profileHelpers.getMatchingProfiles(user).then((profiles)=>{
+  res.render('user/matching-profiles',{profiles, admin:false, user})
+  })
+})
+
 
 
 
