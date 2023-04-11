@@ -2,13 +2,23 @@
 
 <nav class="navbar navbar-light bg-light">
   <form class="form-inline">
-    &nbsp;&nbsp;&nbsp; 
-    <a href="/send-interest-button" class="btn btn-secondary">Interest Send</a>    
-     &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; 
-     &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
-     &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
-     &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
-     <h4 class="text-center">Interest Received</h4>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+     
+    <h3 class="text-center">Interest Received</h4>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    
+    <a href="/send-interest-button" class="btn btn-secondary">Interest Send</a> 
+     &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/accepted-interest" class="btn btn-secondary">Profiles Accepted</a>
+     &nbsp;&nbsp;&nbsp;&nbsp;  
+    <a href="/declined-interest" class="btn btn-secondary">Profiles Declined</a>
     
   </form>
 </nav>
@@ -29,8 +39,17 @@
         <p class="card-text">{{this.receivedDetails.Msg}}</p>
         <p class="card-text">Interest received on {{this.receivedDetails.Date}}</p>
         <a href="/view-profile/{{this._id}}" class="btn btn-secondary mr-4">View Profile</a>
-        <a href="/cancel-intrest/{{this._id}}" class="btn btn-secondary mr-4">Accept Interest</a>
-        <a href="/cancel-intrest/{{this._id}}" class="btn btn-secondary">Decline Interest</a>
+        {{#if_equal this.receivedDetails.Response "Accepted"}}
+        <button onclick="accept_interest('{{this._id}}')" class="btn btn-secondary mr-4">Accepted</button>
+        {{else}}
+        <button onclick="accept_interest('{{this._id}}')" class="btn btn-secondary mr-4">Accept Interest</button>
+        {{/if_equal}}
+        {{#if_equal this.receivedDetails.Response "Declined"}}
+        <button onclick="decline_interest('{{this._id}}')" class="btn btn-secondary mr-4">Declined</button>
+        {{else}}
+        <button onclick="decline_interest('{{this._id}}')" class="btn btn-secondary mr-4">Decline Interest</button>
+        {{/if_equal}}
+        
       </div>
     </div>
   </div>
@@ -38,3 +57,36 @@
  {{/each}}
 </div>
 </section>
+
+
+<script>
+
+  function accept_interest(proId){
+       
+        $.ajax({
+            url:'/accept-interest/'+proId,
+            method:'get',
+            success:(response)=>{
+                if(response){
+                    location.reload()
+                }
+               
+            }
+        })
+    }
+
+    function decline_interest(proId){
+       
+        $.ajax({
+            url:'/decline-interest/'+proId,
+            method:'get',
+            success:(response)=>{
+                if(response){
+                    location.reload()
+                }
+               
+            }
+        })
+    }
+
+</script>

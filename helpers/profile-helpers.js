@@ -48,15 +48,47 @@ module.exports={
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:user.Email})
 
             if(user.Gender=="Male"){
-                let matchedProfiles =await db.get().collection(collection.PROFILE_COLLECTION)
-                .find({email:{$nin:[user.Email]}, age:userProfile.ffage1, height:userProfile.ffheight1,
-                religion:userProfile.ffreligion, gender:"Female"}).toArray()
+                let matchedProfiles=await db.get().collection(collection.PROFILE_COLLECTION).aggregate([
+                    {
+                        $match:{
+                            $and:[
+                                {$or:[
+                                    {caste:userProfile.ffcaste},
+                                    {complexion:userProfile.ffcomplexion}
+
+                                ]},
+                                {gender:"Female"},
+                                {age:{$gte:userProfile.ffage1, $lte:userProfile.ffage2}},
+                                {height:{$gte:userProfile.ffheight1, $lte:userProfile.ffheight2}},
+                                {religion:userProfile.ffreligion}
+                            ]
+
+                        }
+                        
+                    }
+                ]).toArray()
                 resolve(matchedProfiles)
 
             }else{
-               let matchedProfiles =await db.get().collection(collection.PROFILE_COLLECTION)
-               .find({email:{$nin:[user.Email]}, age:userProfile.ffage1, height:userProfile.ffheight1,
-               religion:userProfile.ffreligion, gender:"Male"}).toArray()
+               let matchedProfiles =await db.get().collection(collection.PROFILE_COLLECTION).aggregate([
+                {
+                    $match:{
+                        $and:[
+                            {$or:[
+                                {caste:userProfile.ffcaste},
+                                {complexion:userProfile.ffcomplexion}
+
+                            ]},
+                            {gender:"Male"},
+                            {age:{$gte:userProfile.ffage1, $lte:userProfile.ffage2}},
+                            {height:{$gte:userProfile.ffheight1, $lte:userProfile.ffheight2}},
+                            {religion:userProfile.ffreligion}
+                        ]
+
+                    }
+                    
+                }
+               ]).toArray()
                resolve(matchedProfiles)
             }
          })
@@ -102,29 +134,31 @@ module.exports={
             
                     To:ObjectId(proId),
                     Msg:data.comment,
+                    Response:"Initiated",
                     Date:new Date()                                
                     }
 
           let sendObj={
                     From:ObjectId(userId),
                     Msg:data.comment,
+                    Response:"Initiated",
                     Date:new Date()                        
                        }          
 
             let sendProfile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
 
-            db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).insertOne(userProfile)
+             db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).insertOne(userProfile)
 
             db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(sendProfile)
 
-            db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:ObjectId(userProfile._id)},
+            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:ObjectId(userProfile._id)},
             {
                  $push:{receivedDetails:reObj}
             }
                 )
       
-            db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
+            await db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
             {
                   $push:{sendDetails:sendObj}     
             }
@@ -320,6 +354,87 @@ module.exports={
                 resolve()
             })
         })
+    },
+
+    interestAccepted:(proId, email)=>{
+        return new Promise(async(resolve, reject)=>{
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+
+           await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
+           .updateOne({_id:ObjectId(proId) ,'receivedDetails.To':ObjectId(user._id)},
+              
+            {
+                $set:{
+                    'receivedDetails.$.Response':"Accepted"
+                     }
+            }
+            )  
+            resolve()  
+        })
+        
+    },
+
+    interestDeclined:(proId, email)=>{
+        return new Promise(async(resolve, reject)=>{
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+
+           await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
+           .updateOne({_id:ObjectId(proId) , 'receivedDetails.To':ObjectId(user._id)},
+              
+            {
+                $set:{
+                    'receivedDetails.$.Response':"Declined"
+                     }
+            }
+            )  
+            resolve()  
+        })
+        
+    },
+
+    accepted_profiles:(email)=>{
+        return new Promise(async(resolve,reject)=>{   
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).aggregate([
+             {
+                $match:{'receivedDetails.To' :ObjectId(user._id)}
+              },
+              {
+                   $unwind:'$receivedDetails'
+                
+              },
+              {
+                $match:{'receivedDetails.To' :ObjectId(user._id), 'receivedDetails.Response' :"Accepted"}
+              },
+
+           ]).sort({_id:-1}).toArray()
+          resolve(profiles)
+            
+        })
+
+    },
+
+    declined_profiles:(email)=>{
+        return new Promise(async(resolve,reject)=>{   
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).aggregate([
+             {
+                $match:{'receivedDetails.To' :ObjectId(user._id)}
+              },
+              {
+                   $unwind:'$receivedDetails'
+                
+              },
+              {
+                $match:{'receivedDetails.To' :ObjectId(user._id), 'receivedDetails.Response' :"Declined"}
+              },
+
+           ]).sort({_id:-1}).toArray()
+          resolve(profiles)
+            
+        })
+
     }
+
 
 }

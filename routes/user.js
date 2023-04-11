@@ -214,6 +214,32 @@ router.get('/matches', (req,res)=>{
   })
 })
 
+router.get('/accept-interest/:id', verifyLogin, (req,res)=>{
+  let user=req.session.user
+  profileHelpers.interestAccepted(req.params.id, user.Email).then(()=>{
+    res.json({status:true})  
+  })
+})
+
+router.get('/decline-interest/:id', verifyLogin, (req,res)=>{
+  let user=req.session.user
+  profileHelpers.interestDeclined(req.params.id, user.Email).then(()=>{
+    res.json({status:true})  
+  })
+})
+
+router.get('/accepted-interest', verifyLogin, async(req,res)=>{
+  let user=req.session.user
+  let profiles=await profileHelpers.accepted_profiles(user.Email)
+  res.render('user/accepted-interest',{user, profiles})
+})
+
+router.get('/declined-interest', verifyLogin, async(req,res)=>{
+  let user=req.session.user
+  let profiles=await profileHelpers.declined_profiles(user.Email)
+  res.render('user/declined-interest',{user,profiles})
+})
+
 
 
 
