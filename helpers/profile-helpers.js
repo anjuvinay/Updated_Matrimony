@@ -358,10 +358,18 @@ module.exports={
 
     interestAccepted:(proId, email)=>{
         return new Promise(async(resolve, reject)=>{
-            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+            let person=await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let user= await db.get().collection(collection.USER_COLLECTION).findOne({Email:person.email})
 
+            console.log(userProfile)
+            console.log(person)
+            console.log(user)
+            console.log("userProfile._id: " + userProfile._id)
+            console.log("user._id : " + user._id)
+            
            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-           .updateOne({_id:ObjectId(proId) ,'receivedDetails.To':ObjectId(user._id)},
+           .updateOne({_id:ObjectId(proId) ,'receivedDetails.To':ObjectId(userProfile._id)},
               
             {
                 $set:{
@@ -369,6 +377,15 @@ module.exports={
                      }
             }
             )  
+
+            await db.get().collection(collection.INTEREST_SEND_COLLECTION)
+            .updateOne({_id:ObjectId(userProfile._id) ,'sendDetails.From':ObjectId(user._id)},
+            {
+                $set:{
+                    'sendDetails.$.Response': "Accepted"
+                }
+            }
+            )
             resolve()  
         })
         
@@ -376,10 +393,12 @@ module.exports={
 
     interestDeclined:(proId, email)=>{
         return new Promise(async(resolve, reject)=>{
-            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+            let person=await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let user= await db.get().collection(collection.USER_COLLECTION).findOne({Email:person.email})
 
            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-           .updateOne({_id:ObjectId(proId) , 'receivedDetails.To':ObjectId(user._id)},
+           .updateOne({_id:ObjectId(proId) , 'receivedDetails.To':ObjectId(userProfile._id)},
               
             {
                 $set:{
@@ -387,6 +406,15 @@ module.exports={
                      }
             }
             )  
+
+            await db.get().collection(collection.INTEREST_SEND_COLLECTION)
+            .updateOne({_id:ObjectId(userProfile._id) ,'sendDetails.From':ObjectId(user._id)},
+            {
+                $set:{
+                    'sendDetails.$.Response': "Declined"
+                }
+            }
+            )
             resolve()  
         })
         
