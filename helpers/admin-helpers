@@ -46,7 +46,7 @@ module.exports={
 
     verifiedStatus:(proId)=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
                 $set:{
                     status:'Verified'

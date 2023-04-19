@@ -109,19 +109,31 @@ router.get('/send-interest-button', verifyLogin, (req,res)=>{
 
 })
 
-router.get('/interest', verifyLogin, (req,res)=>{
+router.get('/interest', verifyLogin, async(req,res)=>{
   let user=req.session.user
-  profileHelpers.interest_received(user.Email).then((profiles)=>{
-    res.render('user/received-interest',{profiles,user})
-    })
+  let profile=await profileHelpers.verifyMyProfile(user.Email)
+  if(profile){
+    profileHelpers.interest_received(user.Email).then((profiles)=>{
+      res.render('user/received-interest',{profiles,user})
+      })
+  }else{
+    res.redirect('/create-profile')
+  } 
 
   })
 
 
-  router.get('/send-intrest/:id',verifyLogin, (req, res)=>{
+  router.get('/send-intrest/:id',verifyLogin, async(req, res)=>{
     let user=req.session.user
     let proId=req.params.id
-         res.render('user/interest-msg',{admin:false, user,proId}) 
+    let profile=await profileHelpers.verifyMyProfile(user.Email)
+      console.log(profile)
+      if(profile){
+        res.render('user/interest-msg',{admin:false, user,proId})
+      }else{
+        res.redirect('/create-profile')
+      } 
+    
     })
 
     
@@ -207,11 +219,16 @@ router.get('/change-image1/:id',verifyLogin, (req,res)=>{
   }) 
 })
 
-router.get('/matches', (req,res)=>{
+router.get('/matches', async(req,res)=>{
   let user=req.session.user
-  profileHelpers.getMatchingProfiles(user).then((profiles)=>{
-  res.render('user/matching-profiles',{profiles, admin:false, user})
-  })
+  let profile=await profileHelpers.verifyMyProfile(user.Email)
+  if(profile){
+    profileHelpers.getMatchingProfiles(user).then((profiles)=>{
+      res.render('user/matching-profiles',{profiles, admin:false, user})
+      })
+  }else{
+    res.redirect('/create-profile')
+  } 
 })
 
 router.get('/accept-interest/:id', verifyLogin, (req,res)=>{

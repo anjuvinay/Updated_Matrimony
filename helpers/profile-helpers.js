@@ -27,7 +27,6 @@ module.exports={
     },
 
     getVerifiedProfiles:(user)=>{
-        console.log(user)
              return new Promise(async(resolve,reject)=>{
 
                 if(user.Gender=="Male"){
@@ -98,13 +97,13 @@ module.exports={
 
     detailed_profile:(proId)=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
                 $set:{
                     flag:"image1"
                 }
             })
-            let item =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let item =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)})
                 resolve(item)
             
         })
@@ -132,33 +131,33 @@ module.exports={
           let  proId=data.Id
           let reObj={
             
-                    To:ObjectId(proId),
+                    To:new ObjectId(proId),
                     Msg:data.comment,
                     Response:"Initiated",
                     Date:new Date()                                
                     }
 
           let sendObj={
-                    From:ObjectId(userId),
+                    From:new ObjectId(userId),
                     Msg:data.comment,
                     Response:"Initiated",
                     Date:new Date()                        
                        }          
 
-            let sendProfile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let sendProfile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)})
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
 
              db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).insertOne(userProfile)
 
             db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(sendProfile)
 
-            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:ObjectId(userProfile._id)},
+            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:new ObjectId(userProfile._id)},
             {
                  $push:{receivedDetails:reObj}
             }
                 )
       
-            await db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
+            await db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
                   $push:{sendDetails:sendObj}     
             }
@@ -166,13 +165,13 @@ module.exports={
 
     let totalProfiles=await db.get().collection(collection.INTEREST_SEND_COLLECTION).aggregate([
                 {
-                  $match:{'sendDetails.From' :ObjectId(userId)}
+                  $match:{'sendDetails.From' :new ObjectId(userId)}
                 },
                 {
                     $unwind:'$sendDetails'
                 },
                 {
-                    $match:{'sendDetails.From' :ObjectId(userId)}
+                    $match:{'sendDetails.From' :new ObjectId(userId)}
                 }
              ]).sort({_id:-1}).toArray()
              
@@ -185,13 +184,13 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
             let profiles= await db.get().collection(collection.INTEREST_SEND_COLLECTION).aggregate([
                 {
-                    $match:{'sendDetails.From' :ObjectId(userId)}
+                    $match:{'sendDetails.From' :new ObjectId(userId)}
                   },
                   {
                       $unwind:'$sendDetails'
                   },
                   {
-                    $match:{'sendDetails.From' :ObjectId(userId)}
+                    $match:{'sendDetails.From' :new ObjectId(userId)}
                   }
                ]).sort({_id:-1}).toArray()
          resolve(profiles)
@@ -203,14 +202,14 @@ module.exports={
             let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
              let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).aggregate([
              {
-                $match:{'receivedDetails.To' :ObjectId(user._id)}
+                $match:{'receivedDetails.To' :new ObjectId(user._id)}
               },
               {
                    $unwind:'$receivedDetails'
                 
               },
               {
-                $match:{'receivedDetails.To' :ObjectId(user._id)}
+                $match:{'receivedDetails.To' :new ObjectId(user._id)}
               },
 
            ]).sort({_id:-1}).toArray()
@@ -225,7 +224,7 @@ module.exports={
             let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
             if(user){
             let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-            .find({'receivedDetails.To':ObjectId(user._id)}).toArray()
+            .find({'receivedDetails.To':new ObjectId(user._id)}).toArray()
 
             let count=0
             count=profiles.length
@@ -243,12 +242,12 @@ module.exports={
         return new Promise((resolve,reject)=>{
             db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({email:user.Email},
             {
-                $pull:{receivedDetails:{To:ObjectId(proId)}}
+                $pull:{receivedDetails:{To:new ObjectId(proId)}}
             }
             )
-            db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:ObjectId(proId)},
+            db.get().collection(collection.INTEREST_SEND_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
-                $pull:{sendDetails:{From:ObjectId(userId)}}
+                $pull:{sendDetails:{From:new ObjectId(userId)}}
             }
             ).then((response)=>{
                 resolve(response)
@@ -259,7 +258,7 @@ module.exports={
 
     myProfileDetails:(proId)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)}).then((profile)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)}).then((profile)=>{
                 resolve(profile)
             })
         })
@@ -268,7 +267,7 @@ module.exports={
     updateProfile:(proId, proDetails)=>{
         return new Promise((resolve, reject)=>{
             db.get().collection(collection.PROFILE_COLLECTION).
-            updateOne({_id:ObjectId(proId)},{
+            updateOne({_id:new ObjectId(proId)},{
                 $set:{
                     Name:proDetails.Name,
                     age:proDetails.age,
@@ -311,7 +310,7 @@ module.exports={
 
     deleteProfile:(prodId)=>{
         return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).deleteOne({_id:ObjectId(prodId)}).then((response)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).deleteOne({_id:new ObjectId(prodId)}).then((response)=>{
                 resolve(response)
             })
         })
@@ -319,7 +318,7 @@ module.exports={
 
     imageStatus:(proId)=>{
         return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
                 $set:{
                     flag:"image2"
@@ -332,7 +331,7 @@ module.exports={
 
     imageStatus3:(proId)=>{
         return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
                 $set:{
                     flag:"image3"
@@ -345,7 +344,7 @@ module.exports={
 
     imageStatus1:(proId)=>{
         return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:ObjectId(proId)},
+            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
             {
                 $set:{
                     flag:"image1"
@@ -359,17 +358,12 @@ module.exports={
     interestAccepted:(proId, email)=>{
         return new Promise(async(resolve, reject)=>{
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
-            let person=await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let person=await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)})
             let user= await db.get().collection(collection.USER_COLLECTION).findOne({Email:person.email})
 
-            console.log(userProfile)
-            console.log(person)
-            console.log(user)
-            console.log("userProfile._id: " + userProfile._id)
-            console.log("user._id : " + user._id)
             
            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-           .updateOne({_id:ObjectId(proId) ,'receivedDetails.To':ObjectId(userProfile._id)},
+           .updateOne({_id:new ObjectId(proId) ,'receivedDetails.To':new ObjectId(userProfile._id)},
               
             {
                 $set:{
@@ -379,7 +373,7 @@ module.exports={
             )  
 
             await db.get().collection(collection.INTEREST_SEND_COLLECTION)
-            .updateOne({_id:ObjectId(userProfile._id) ,'sendDetails.From':ObjectId(user._id)},
+            .updateOne({_id:new ObjectId(userProfile._id) ,'sendDetails.From':new ObjectId(user._id)},
             {
                 $set:{
                     'sendDetails.$.Response': "Accepted"
@@ -394,11 +388,11 @@ module.exports={
     interestDeclined:(proId, email)=>{
         return new Promise(async(resolve, reject)=>{
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
-            let person=await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:ObjectId(proId)})
+            let person=await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)})
             let user= await db.get().collection(collection.USER_COLLECTION).findOne({Email:person.email})
 
            await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
-           .updateOne({_id:ObjectId(proId) , 'receivedDetails.To':ObjectId(userProfile._id)},
+           .updateOne({_id:new ObjectId(proId) , 'receivedDetails.To':new ObjectId(userProfile._id)},
               
             {
                 $set:{
@@ -408,7 +402,7 @@ module.exports={
             )  
 
             await db.get().collection(collection.INTEREST_SEND_COLLECTION)
-            .updateOne({_id:ObjectId(userProfile._id) ,'sendDetails.From':ObjectId(user._id)},
+            .updateOne({_id:new ObjectId(userProfile._id) ,'sendDetails.From':new ObjectId(user._id)},
             {
                 $set:{
                     'sendDetails.$.Response': "Declined"
@@ -425,14 +419,14 @@ module.exports={
             let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
              let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).aggregate([
              {
-                $match:{'receivedDetails.To' :ObjectId(user._id)}
+                $match:{'receivedDetails.To' :new ObjectId(user._id)}
               },
               {
                    $unwind:'$receivedDetails'
                 
               },
               {
-                $match:{'receivedDetails.To' :ObjectId(user._id), 'receivedDetails.Response' :"Accepted"}
+                $match:{'receivedDetails.To' :new ObjectId(user._id), 'receivedDetails.Response' :"Accepted"}
               },
 
            ]).sort({_id:-1}).toArray()
@@ -447,14 +441,14 @@ module.exports={
             let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
              let profiles= await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).aggregate([
              {
-                $match:{'receivedDetails.To' :ObjectId(user._id)}
+                $match:{'receivedDetails.To' :new ObjectId(user._id)}
               },
               {
                    $unwind:'$receivedDetails'
                 
               },
               {
-                $match:{'receivedDetails.To' :ObjectId(user._id), 'receivedDetails.Response' :"Declined"}
+                $match:{'receivedDetails.To' :new ObjectId(user._id), 'receivedDetails.Response' :"Declined"}
               },
 
            ]).sort({_id:-1}).toArray()
@@ -462,6 +456,19 @@ module.exports={
             
         })
 
+    },
+
+    verifyMyProfile:(email)=>{
+        return new Promise(async(resolve,reject)=>{
+            let user=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+           
+            if(user){
+                resolve(user)
+            }else{
+                resolve(null)
+            } 
+               
+        })
     }
 
 
