@@ -201,24 +201,6 @@ router.get('/delete-profile/:id',(req,res)=>{
 })
 
 
-router.get('/change-image2/:id',verifyLogin, (req,res)=>{
-  profileHelpers.imageStatus(req.params.id).then(()=>{
-   res.json(response)
-  }) 
-})
-
-router.get('/change-image3/:id',verifyLogin, (req,res)=>{
-  profileHelpers.imageStatus3(req.params.id).then(()=>{
-   res.json(response)
-  }) 
-})
-
-router.get('/change-image1/:id',verifyLogin, (req,res)=>{
-  profileHelpers.imageStatus1(req.params.id).then(()=>{
-   res.json(response)
-  }) 
-})
-
 router.get('/matches', async(req,res)=>{
   let user=req.session.user
   let profile=await profileHelpers.verifyMyProfile(user.Email)

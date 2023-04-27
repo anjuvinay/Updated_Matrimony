@@ -1,43 +1,43 @@
 <section>
+
+     <style>
+        .geeks {
+            width: 21 rem;
+            height: 19 rem;
+            overflow:visible;
+            margin:auto;
+        }
+     
+        .geeks img {
+            width: 100%;
+            transition: 0.5s all ease-in-out;
+        }
+     
+        .geeks:hover img {
+            transform: scale(1.5);
+        }
+    </style>
+
+
     <div class="container mt-4">
         <form action="" id="checkout-form">
             <div class="row">
                  <div class="col-md-4">
                    <br>
-                   {{#if_equal profile.flag "image2"}}
-                    <div>
-                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top" alt="...">
-                    </div>
-                    <br>
-                    <div>
-                        <img onclick="changeImage1('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top " alt="...">
-                   
-                        <img onclick="changeImage3('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top pl-1" alt="...">
-                    </div>
-                    {{/if_equal}}
-                    {{#if_equal profile.flag "image3"}}
-                     <div>
-                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top" alt="...">
-                    </div>
-                    <br>
-                    <div>
-                        <img onclick="changeImage2('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
-                   
-                        <img onclick="changeImage1('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top pl-1" alt="...">
-                    </div>
-                    {{/if_equal}}
-                    {{#if_equal profile.flag "image1"}}
-                    <div>
-                        <img style="width: 20rem; height: 19rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top" alt="...">
+                    <div class="geeks">
+                        <img style="width: 21rem; height: 19rem;" src="/profile-images/{{profile._id}}1.jpg" class="card-img-top" alt="...">
                     </div>
                    
                     <br>
-                    <div>
-                        <img onclick="changeImage2('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
-                   
-                        <img onclick="changeImage3('{{profile._id}}')" style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top pl-1" alt="...">
+                    <div class="row no-gutters">
+                        <div class="col-md-6 geeks">
+                        <img style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}2.jpg" class="card-img-top " alt="...">
+                        </div>
+
+                        <div class="col-md-6 geeks">
+                        <img style="width: 10rem; height: 8rem;" src="/profile-images/{{profile._id}}3.jpg" class="card-img-top" alt="...">
+                        </div>
                     </div>
-                     {{/if_equal}}
 
                      
                 </div> 
@@ -88,7 +88,7 @@
                         <hr>
                         <h6>Mobile: {{profile.mobile}} </h6>
                         <hr>   
-                          <a href="/send-intrest/{{profile._id}}" class="btn btn-primary mr-4">Send Intrest</a>
+                          <a href="/send-intrest/{{profile._id}}" class="btn btn-primary mr-4">Send Interest</a>
                           <a href="/send-message/{{profile._id}}" class="btn btn-primary">Send Message</a>        
                          <br><br><br><br><br>
                         </div>
@@ -149,41 +149,3 @@
     </div>
 </section>
 
-<script>
-    function changeImage2(proId){
-    $.ajax({
-        url:'/change-image2/'+proId,
-        method:'get',
-        success:(Response)=>{
-            if(Response){
-              location.reload()
-            }          
-        }
-    })
-}
-
-function changeImage3(proId){
-    $.ajax({
-        url:'/change-image3/'+proId,
-        method:'get',
-        success:(Response)=>{
-            if(Response){
-              location.reload()
-            }          
-        }
-    })
-}
-
-function changeImage1(proId){
-    $.ajax({
-        url:'/change-image1/'+proId,
-        method:'get',
-        success:(Response)=>{
-            if(Response){
-              location.reload()
-            }          
-        }
-    })
-}
-
-</script>

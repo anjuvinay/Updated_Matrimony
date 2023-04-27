@@ -316,45 +316,6 @@ module.exports={
         })
     },
 
-    imageStatus:(proId)=>{
-        return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
-            {
-                $set:{
-                    flag:"image2"
-                }
-            }).then(()=>{
-                resolve()
-            })
-        })
-    },
-
-    imageStatus3:(proId)=>{
-        return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
-            {
-                $set:{
-                    flag:"image3"
-                }
-            }).then(()=>{
-                resolve()
-            })
-        })
-    },
-
-    imageStatus1:(proId)=>{
-        return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({_id:new ObjectId(proId)},
-            {
-                $set:{
-                    flag:"image1"
-                }
-            }).then(()=>{
-                resolve()
-            })
-        })
-    },
-
     interestAccepted:(proId, email)=>{
         return new Promise(async(resolve, reject)=>{
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
