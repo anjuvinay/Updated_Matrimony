@@ -4,24 +4,50 @@ var profileHelpers=require('../helpers/profile-helpers')
 const userHelpers=require('../helpers/user-helpers')
 const adminHelpers=require('../helpers/admin-helpers');
 const { response } = require('express');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-const verifyLogin = (req, res, next)=>{
-  if(req.session.user){
-    next()
-  }else{
-    res.redirect('/login')
+
+
+function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
+
+  const token = authHeader.split(' ')[1]; 
+
+  jwt.verify(token, JWT_SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid token' });
+    }
+
+    req._id = decoded._id; 
+    next();
+  });
 }
 
+
 /* GET home page. */
-router.get('/',verifyLogin, async function(req, res, next) {
-  let user=req.session.user
-  let interestCount=null 
-    interestCount=await profileHelpers.interest_count(user.Email)
+// router.get('/',verifyLogin, async function(req, res, next) {
+//   let user=req.session.user
+//   let interestCount=null 
+//     interestCount=await profileHelpers.interest_count(user.Email)
   
- profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
+//  profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
  
-  res.render('user/view-profiles', {profiles,user,interestCount});
+//   res.render('user/view-profiles', {profiles,user,interestCount});
+//  })
+  
+// });
+
+router.get('/pro',verifyToken, async function(req, res, next) {
+  
+ profileHelpers.getVerifiedProfiles1().then((profiles)=>{
+  res.json({ "items":profiles});
+  
  })
   
 });
@@ -31,7 +57,7 @@ router.get('/create-profile', function(req, res, next){
   res.render('user/add-profile', {admin:false, user});
 })
 
-router.post('/create-profile',verifyLogin, (req,res)=>{
+router.post('/create-profile',verifyToken, (req,res)=>{
 profileHelpers.addProfile(req.body,(insertedId)=>{
   let image1=req.files.image1
   let image2=req.files.image2
@@ -51,38 +77,33 @@ profileHelpers.addProfile(req.body,(insertedId)=>{
 })
 })
 
-router.get('/login',(req,res)=>{
-  if(req.session.user){
-    res.redirect('/')
-  }else
-  res.render('user/login',{"loginErr":req.session.loginErr})
-  req.session.loginErr=false
-})
 
-router.get('/signup',(req,res)=>{
-  res.render('user/signup')
-})
+
 
 router.post('/signup',(req,res)=>{
   userHelpers.doSignup(req.body).then((response)=>{
     console.log(response)
-    req.session.user=response
-    req.session.user.loggedIn=true
-    res.redirect('/')
+    // req.session.user=response
+    // req.session.user.loggedIn=true
+    if(response===null){
+      res.json({ "result":false });
+    }
+    else{
+      res.json({ "result":true });
+    }
+    
   })
   
 })
 
 router.post('/login',(req, res)=>{
   userHelpers.doLogin(req.body).then((response)=>{
-    if(response.status){ 
-      req.session.user=response.user
-      req.session.user.loggedIn=true
-      console.log(req.session.user)
-      res.redirect('/')
+    if(response.status===true){ 
+      // res.json({ "logged":true});
+      res.json({ logged: true, token: response.token });
     }else{
-      req.session.loginErr="Invalid username or Password"
-      res.redirect('/login')
+      // res.json({ "logged":false});
+      res.json({ logged: false });
     }
   })
 })
@@ -92,7 +113,7 @@ router.get('/logout',(req,res)=>{
   res.redirect('/')
 })
 
-router.get('/view-profile/:id',verifyLogin, (req,res)=>{
+router.get('/view-profile/:id',verifyToken, (req,res)=>{
   let user=req.session.user
   profileHelpers.detailed_profile(req.params.id).then((profile)=>{
     res.render('user/view-Eprofile',{user,profile})
@@ -100,7 +121,7 @@ router.get('/view-profile/:id',verifyLogin, (req,res)=>{
 
 })
 
-router.get('/send-interest-button', verifyLogin, (req,res)=>{
+router.get('/send-interest-button', verifyToken, (req,res)=>{
   let user=req.session.user
   profileHelpers.intrest(req.session.user._id).then((profiles)=>{
     console.log(profiles)
@@ -109,7 +130,7 @@ router.get('/send-interest-button', verifyLogin, (req,res)=>{
 
 })
 
-router.get('/interest', verifyLogin, async(req,res)=>{
+router.get('/interest', verifyToken, async(req,res)=>{
   let user=req.session.user
   let profile=await profileHelpers.verifyMyProfile(user.Email)
   if(profile){
@@ -123,7 +144,7 @@ router.get('/interest', verifyLogin, async(req,res)=>{
   })
 
 
-  router.get('/send-intrest/:id',verifyLogin, async(req, res)=>{
+  router.get('/send-intrest/:id',verifyToken, async(req, res)=>{
     let user=req.session.user
     let proId=req.params.id
     let profile=await profileHelpers.verifyMyProfile(user.Email)
@@ -137,7 +158,7 @@ router.get('/interest', verifyLogin, async(req,res)=>{
     })
 
     
-  router.post('/int-msg', verifyLogin, (req, res)=>{
+  router.post('/int-msg', verifyToken, (req, res)=>{
       let user=req.session.user
       profileHelpers.intrest_send(req.body, req.session.user._id, user.Email).then((profiles)=>{
         res.redirect('/send-interest-button')
@@ -145,14 +166,14 @@ router.get('/interest', verifyLogin, async(req,res)=>{
   })
   
 
-router.get('/cancel-intrest/:id', verifyLogin, (req,res)=>{
+router.get('/cancel-intrest/:id', verifyToken, (req,res)=>{
   let user=req.session.user
   profileHelpers.delete_intrest(req.params.id, req.session.user._id,user)
     res.redirect('/send-interest-button')   
 })
 
 
-router.get('/my-profile',verifyLogin,(req,res,next)=>{
+router.get('/my-profile',verifyToken,(req,res,next)=>{
   let user=req.session.user
   profileHelpers.my_detailed_profile(user.Email).then((profile)=>{  
   res.render('user/my-profile', {profile,admin:false, user}) 
@@ -173,16 +194,16 @@ router.post('/edit-profile/:id',(req,res)=>{
   profileHelpers.updateProfile(req.params.id, req.body).then(()=>{
     res.redirect('/my-profile')
 
-    if(req.files.image1){
+    if(req.files && req.files.image1){
       
       let image1=req.files.image1
       image1.mv('./public/profile-images/'+insertedId+1+'.jpg') 
     }
-    if(req.files.image2){
+    if(req.files && req.files.image2){
       let image2=req.files.image2
       image2.mv('./public/profile-images/'+insertedId+2+'.jpg')
     }
-    if(req.files.image3){
+    if(req.files && req.files.image3){
       let image3=req.files.image3 
       image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
     }
@@ -213,27 +234,27 @@ router.get('/matches', async(req,res)=>{
   } 
 })
 
-router.get('/accept-interest/:id', verifyLogin, (req,res)=>{
+router.get('/accept-interest/:id', verifyToken, (req,res)=>{
   let user=req.session.user
   profileHelpers.interestAccepted(req.params.id, user.Email).then(()=>{
     res.json({status:true})  
   })
 })
 
-router.get('/decline-interest/:id', verifyLogin, (req,res)=>{
+router.get('/decline-interest/:id', verifyToken, (req,res)=>{
   let user=req.session.user
   profileHelpers.interestDeclined(req.params.id, user.Email).then(()=>{
     res.json({status:true})  
   })
 })
 
-router.get('/accepted-interest', verifyLogin, async(req,res)=>{
+router.get('/accepted-interest', verifyToken, async(req,res)=>{
   let user=req.session.user
   let profiles=await profileHelpers.accepted_profiles(user.Email)
   res.render('user/accepted-interest',{user, profiles})
 })
 
-router.get('/declined-interest', verifyLogin, async(req,res)=>{
+router.get('/declined-interest', verifyToken, async(req,res)=>{
   let user=req.session.user
   let profiles=await profileHelpers.declined_profiles(user.Email)
   res.render('user/declined-interest',{user,profiles})
