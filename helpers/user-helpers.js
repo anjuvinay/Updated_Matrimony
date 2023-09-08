@@ -34,11 +34,11 @@ module.exports={
             if(user){
                 bcrypt.compare(userData.Password, user.Password).then((status)=>{
                     if(status){       
-                      const token = jwt.sign({ userId: user._id }, JWT_SECRET_KEY, { expiresIn: '5h' });
+                      const token = jwt.sign({ userId:user._id,Email:userData.Email }, JWT_SECRET_KEY, { expiresIn: '5h' });
                       console.log("Login Success");
-                      resolve({ status: true, token }); // Include the token in the response
+                      resolve({ status: true, token }); 
                     } else {
-                       console.log("Login Failed");
+                       console.log("Login Failed"); 
                        resolve({ status: false });
                     }
    

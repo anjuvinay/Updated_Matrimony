@@ -5,6 +5,7 @@ const userHelpers=require('../helpers/user-helpers')
 const adminHelpers=require('../helpers/admin-helpers');
 const { response } = require('express');
 const jwt = require('jsonwebtoken');
+const { token } = require('morgan');
 require('dotenv').config();
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
@@ -19,11 +20,13 @@ function verifyToken(req, res, next) {
 
   const token = authHeader.split(' ')[1]; 
 
+
   jwt.verify(token, JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid token' });
     }
-
+    const userEmail = decoded.Email;
+    req.userEmail = userEmail;
     req._id = decoded._id; 
     next();
   });
@@ -44,10 +47,10 @@ function verifyToken(req, res, next) {
 // });
 
 router.get('/pro',verifyToken, async function(req, res, next) {
-  
- profileHelpers.getVerifiedProfiles1().then((profiles)=>{
-  res.json({ "items":profiles});
-  
+  const userEmail = req.userEmail;
+ profileHelpers.getVerifiedProfiles1(userEmail).then((profiles)=>{
+  res.json({ "items":profiles}); 
+   
  })
   
 });
@@ -99,10 +102,9 @@ router.post('/signup',(req,res)=>{
 router.post('/login',(req, res)=>{
   userHelpers.doLogin(req.body).then((response)=>{
     if(response.status===true){ 
-      // res.json({ "logged":true});
       res.json({ logged: true, token: response.token });
-    }else{
-      // res.json({ "logged":false});
+    }
+    else{
       res.json({ logged: false });
     }
   })
