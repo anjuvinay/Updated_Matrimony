@@ -44,7 +44,7 @@ function verifyToken(req, res, next) {
 //   res.render('user/view-profiles', {profiles,user,interestCount});
 //  })
   
-// });
+// }); 
 
 router.get('/pro',verifyToken, async function(req, res, next) {
   const userEmail = req.userEmail;
@@ -55,12 +55,7 @@ router.get('/pro',verifyToken, async function(req, res, next) {
   
 });
 
-router.get('/create-profile', function(req, res, next){
-  let user=req.session.user
-  res.render('user/add-profile', {admin:false, user});
-})
-
-router.post('/create-profile',verifyToken, (req,res)=>{
+router.post('/create-profile', (req,res)=>{
 profileHelpers.addProfile(req.body,(insertedId)=>{
   let image1=req.files.image1
   let image2=req.files.image2
@@ -71,7 +66,7 @@ profileHelpers.addProfile(req.body,(insertedId)=>{
   image1.mv('./public/profile-images/'+insertedId+1+'.jpg',(err,done)=>{
     
     if(!err){
-      res.redirect('/')
+      console.log("No error")
     }else{
       console.log(err)
     }
@@ -86,8 +81,7 @@ profileHelpers.addProfile(req.body,(insertedId)=>{
 router.post('/signup',(req,res)=>{
   userHelpers.doSignup(req.body).then((response)=>{
     console.log(response)
-    // req.session.user=response
-    // req.session.user.loggedIn=true
+
     if(response===null){
       res.json({ "result":false });
     }
@@ -259,7 +253,7 @@ router.get('/accepted-interest', verifyToken, async(req,res)=>{
 router.get('/declined-interest', verifyToken, async(req,res)=>{
   let user=req.session.user
   let profiles=await profileHelpers.declined_profiles(user.Email)
-  res.render('user/declined-interest',{user,profiles})
+  res.render('user/declined-interest',{user,profiles}) 
 })
 
 
