@@ -28,17 +28,16 @@ module.exports={
 
     doLogin:(userData)=>{
         return new Promise(async(resolve, reject)=>{
-            let loginStatus=false
-            let response={}
             let user=await db.get().collection(collection.USER_COLLECTION).findOne({Email:userData.Email})
+            
             if(user){
                 bcrypt.compare(userData.Password, user.Password).then((status)=>{
-                    if(status){       
-                      const token = jwt.sign({ userId:user._id,Email:userData.Email }, JWT_SECRET_KEY, { expiresIn: '5h' });
+                    if(status){      
+                      const token = jwt.sign({ userId:user._id,Email:userData.Email,Name:user.Name }, JWT_SECRET_KEY, { expiresIn: '5h' });
                       console.log("Login Success");
-                      resolve({ status: true, token }); 
-                    } else {
-                       console.log("Login Failed"); 
+                      resolve({ status: true, token });   
+                    } else { 
+                       console.log("Login Failed");    
                        resolve({ status: false });
                     }
    

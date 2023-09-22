@@ -27,7 +27,11 @@ function verifyToken(req, res, next) {
     }
     const userEmail = decoded.Email;
     req.userEmail = userEmail;
-    req._id = decoded._id; 
+    const Id=decoded.userId; 
+    req.Id = Id
+    const userName=decoded.Name;
+    req.userName = userName;
+
     next();
   });
 }
@@ -48,14 +52,17 @@ function verifyToken(req, res, next) {
 
 router.get('/pro',verifyToken, async function(req, res, next) {
   const userEmail = req.userEmail;
+  const userID = req.Id;
+  const userName=req.userName
+  
  profileHelpers.getVerifiedProfiles1(userEmail).then((profiles)=>{
   res.json({ "items":profiles}); 
-   
+    
  })
   
 });
 
-router.post('/create-profile', (req,res)=>{
+router.post('/create-profile', verifyToken, (req,res)=>{
 profileHelpers.addProfile(req.body,(insertedId)=>{
   let image1=req.files.image1
   let image2=req.files.image2
@@ -80,7 +87,6 @@ profileHelpers.addProfile(req.body,(insertedId)=>{
 
 router.post('/signup',(req,res)=>{
   userHelpers.doSignup(req.body).then((response)=>{
-    console.log(response)
 
     if(response===null){
       res.json({ "result":false });
@@ -105,8 +111,7 @@ router.post('/login',(req, res)=>{
 })
 
 router.get('/logout',(req,res)=>{
-  req.session.destroy()
-  res.redirect('/')
+  res.json({ message: 'Logout successful' });
 })
 
 router.get('/view-profile/:id',verifyToken, (req,res)=>{
@@ -170,9 +175,9 @@ router.get('/cancel-intrest/:id', verifyToken, (req,res)=>{
 
 
 router.get('/my-profile',verifyToken,(req,res,next)=>{
-  let user=req.session.user
-  profileHelpers.my_detailed_profile(user.Email).then((profile)=>{  
-  res.render('user/my-profile', {profile,admin:false, user}) 
+  const userEmail = req.userEmail;
+  profileHelpers.my_detailed_profile(userEmail).then((profile)=>{  
+    res.json({ "items":profile}); 
   }) 
 })
 
