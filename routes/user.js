@@ -110,14 +110,13 @@ router.post('/login',(req, res)=>{
   })
 })
 
-router.get('/logout',(req,res)=>{
-  res.json({ message: 'Logout successful' });
-})
+// router.get('/logout',(req,res)=>{
+//   res.json({ message: 'Logout successful' });
+// })
 
-router.get('/view-profile/:id',verifyToken, (req,res)=>{
-  let user=req.session.user
+router.get('/view-profile/:id',verifyToken, (req,res)=>{ 
   profileHelpers.detailed_profile(req.params.id).then((profile)=>{
-    res.render('user/view-Eprofile',{user,profile})
+    res.json({ "items":profile});
   })
 
 })

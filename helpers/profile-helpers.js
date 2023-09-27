@@ -30,7 +30,7 @@ module.exports={
     getVerifiedProfiles1:(email)=>{
         return new Promise(async(resolve,reject)=>{
             let user=await db.get().collection(collection.USER_COLLECTION).findOne({Email:email})
-            //  console.log(user)
+            
             if(user.Gender=="Male"){
                                 let VerifiedProfiles=await db.get().collection(collection.PROFILE_COLLECTION)
                                 .find({email:{$nin:[user.Email]},status:"Verified",gender:"Female"}).toArray()
