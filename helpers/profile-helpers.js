@@ -114,12 +114,7 @@ module.exports={
 
     my_detailed_profile:(email)=>{
         return new Promise(async(resolve,reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).updateOne({email:email},
-            {
-                $set:{
-                    flag:"image1"
-                }
-            })
+           
             let profile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
             console.log(profile)
             resolve(profile)
@@ -259,18 +254,22 @@ module.exports={
         })
     },
 
-    myProfileDetails:(proId)=>{
+    myProfileDetails:(email)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)}).then((profile)=>{
+            console.log(email)
+            db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email}).then((profile)=>{
                 resolve(profile)
             })
         })
     },
 
-    updateProfile:(proId, proDetails)=>{
-        return new Promise((resolve, reject)=>{
+    updateProfile:(email, proDetails)=>{
+        return new Promise(async(resolve, reject)=>{
+            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
+            let insertedId=(userProfile._id)
+            
             db.get().collection(collection.PROFILE_COLLECTION).
-            updateOne({_id:new ObjectId(proId)},{
+            updateOne({email:email},{
                 $set:{
                     Name:proDetails.Name,
                     age:proDetails.age,
@@ -306,7 +305,7 @@ module.exports={
                     ffphysical:proDetails.ffphysical
                 }
             }).then((response)=>{
-                resolve()
+                resolve(insertedId)
             })
         })
     },

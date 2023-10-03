@@ -110,9 +110,6 @@ router.post('/login',(req, res)=>{
   })
 })
 
-// router.get('/logout',(req,res)=>{
-//   res.json({ message: 'Logout successful' });
-// })
 
 router.get('/view-profile/:id',verifyToken, (req,res)=>{ 
   profileHelpers.detailed_profile(req.params.id).then((profile)=>{
@@ -181,18 +178,18 @@ router.get('/my-profile',verifyToken,(req,res,next)=>{
 })
 
 
-router.get('/edit-profile/:id',async(req,res)=>{
-  let user=req.session.user
-  let profile = await profileHelpers.myProfileDetails(req.params.id)
+router.get('/edit-profile',verifyToken,async(req,res)=>{
+  
+  let profile = await profileHelpers.myProfileDetails(req.userEmail)
+
   console.log(profile)
-  res.render('user/edit-profile',{profile,admin:false,user})
+  res.json({ "items":profile}); 
 })
 
 
-router.post('/edit-profile/:id',(req,res)=>{
-  let insertedId=req.params.id
-  profileHelpers.updateProfile(req.params.id, req.body).then(()=>{
-    res.redirect('/my-profile')
+router.post('/edit-profile',verifyToken,async(req,res)=>{
+  
+  await profileHelpers.updateProfile(req.userEmail, req.body).then((insertedId)=>{
 
     if(req.files && req.files.image1){
       
@@ -209,6 +206,7 @@ router.post('/edit-profile/:id',(req,res)=>{
     }
 
   })
+  res.json({ editted: true });
   
 })
 
