@@ -124,20 +124,22 @@ module.exports={
 
     
 
-    intrest_send:(data, userId, email)=>{
+    intrest_send:(data, proID, userID, email)=>{
         return new Promise(async(resolve, reject)=>{
-          let  proId=data.Id
+          let  proId=proID
+          let userId=userID
+
           let reObj={
             
                     To:new ObjectId(proId),
-                    Msg:data.comment,
+                    Msg:data.message,
                     Response:"Initiated",
                     Date:new Date()                                
                     }
 
           let sendObj={
                     From:new ObjectId(userId),
-                    Msg:data.comment,
+                    Msg:data.message,
                     Response:"Initiated",
                     Date:new Date()                        
                        }          
@@ -145,9 +147,18 @@ module.exports={
             let sendProfile =await db.get().collection(collection.PROFILE_COLLECTION).findOne({_id:new ObjectId(proId)})
             let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
 
-             db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).insertOne(userProfile)
+            const recievedCollection = await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION)
+                                    .findOne({ _id: userProfile._id });
 
-            db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(sendProfile)
+            if(!recievedCollection){
+              db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).insertOne(userProfile)
+            }
+            const sendCollection = await db.get().collection(collection.INTEREST_SEND_COLLECTION)
+                                    .findOne({_id:new ObjectId(proId)});
+           
+            if(!sendCollection) {
+                db.get().collection(collection.INTEREST_SEND_COLLECTION).insertOne(sendProfile)
+            }                       
 
             await db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({_id:new ObjectId(userProfile._id)},
             {
@@ -310,9 +321,9 @@ module.exports={
         })
     },
 
-    deleteProfile:(prodId)=>{
+    deleteProfile:(email)=>{
         return new Promise((resolve, reject)=>{
-            db.get().collection(collection.PROFILE_COLLECTION).deleteOne({_id:new ObjectId(prodId)}).then((response)=>{
+            db.get().collection(collection.PROFILE_COLLECTION).deleteOne({email:email}).then((response)=>{
                 resolve(response)
             })
         })

@@ -10,6 +10,10 @@ require('dotenv').config();
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 
+router.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -64,23 +68,45 @@ router.get('/pro',verifyToken, async function(req, res, next) {
 
 router.post('/create-profile', verifyToken, (req,res)=>{
 profileHelpers.addProfile(req.body,(insertedId)=>{
-  let image1=req.files.image1
-  let image2=req.files.image2
-  let image3=req.files.image3
-
-  image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
-  image2.mv('./public/profile-images/'+insertedId+2+'.jpg') 
-  image1.mv('./public/profile-images/'+insertedId+1+'.jpg',(err,done)=>{
-    
-    if(!err){
-      console.log("No error")
-    }else{
-      console.log(err)
-    }
-  })
   
-})
-})
+//   let image1=req.files.image1
+//   let image2=req.files.image2
+//   let image3=req.files.image3
+
+//   image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
+//   image2.mv('./public/profile-images/'+insertedId+2+'.jpg') 
+//   image1.mv('./public/profile-images/'+insertedId+1+'.jpg',(err,done)=>{
+    
+//     if(!err){
+//       console.log("No error")
+//     }else{
+//       console.log(err)
+//     }
+//   })
+  
+// })
+// })
+
+const uploadImage = (file, index) => {
+  if (file) {
+    const filename = `./public/profile-images/${insertedId}${index}.jpg`;
+    file.mv(filename, (err) => {
+      if (err) {
+        console.error(`Error uploading image ${index}: ${err}`);
+      } else {
+        console.log(`Image ${index} uploaded successfully`);
+      }
+    });
+  }
+};
+
+uploadImage(req.files?.image1, 1);
+uploadImage(req.files?.image2, 2);
+uploadImage(req.files?.image3, 3);
+
+res.json({ message: 'Profile created successfully' });
+});
+});
 
 
 
@@ -155,12 +181,19 @@ router.get('/interest', verifyToken, async(req,res)=>{
     })
 
     
-  router.post('/int-msg', verifyToken, (req, res)=>{
-      let user=req.session.user
-      profileHelpers.intrest_send(req.body, req.session.user._id, user.Email).then((profiles)=>{
-        res.redirect('/send-interest-button')
-    })
+  // router.post('/int-msg', verifyToken, (req, res)=>{
+  //     let user=req.session.user
+  //     profileHelpers.intrest_send(req.body, req.session.user._id, user.Email).then((profiles)=>{
+  //       res.redirect('/send-interest-button')
+  //   })
+  // })
+
+  router.post('/int-msg/:id', verifyToken, async(req, res)=>{
+    const userEmail = req.userEmail; 
+    await profileHelpers.intrest_send(req.body, req.params.id, req.Id, userEmail).then((profiles)=>{
+      res.json({ "sendInterest":true });
   })
+})
   
 
 router.get('/cancel-intrest/:id', verifyToken, (req,res)=>{
@@ -206,21 +239,19 @@ router.post('/edit-profile',verifyToken,async(req,res)=>{
     }
 
   })
-  res.json({ editted: true });
-  
+  res.json({ editted: true });  
 })
 
 
-router.get('/delete-profile/:id',(req,res)=>{
-  let proId=req.params.id
-  profileHelpers.deleteProfile(proId).then((response)=>{
-    res.redirect('/')
+router.get('/delete-profile', verifyToken,(req,res)=>{
+  profileHelpers.deleteProfile(req.userEmail).then((response)=>{
+    res.json({ deleted: true }); 
   })
  
 })
 
 
-router.get('/matches', async(req,res)=>{
+router.get('/matches', verifyToken, async(req,res)=>{
   let user=req.session.user
   let profile=await profileHelpers.verifyMyProfile(user.Email)
   if(profile){

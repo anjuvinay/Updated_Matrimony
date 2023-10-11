@@ -33,7 +33,7 @@ module.exports={
             if(user){
                 bcrypt.compare(userData.Password, user.Password).then((status)=>{
                     if(status){      
-                      const token = jwt.sign({ userId:user._id,Email:userData.Email,Name:user.Name }, JWT_SECRET_KEY, { expiresIn: '5h' });
+                      const token = jwt.sign({ userId:user._id,Email:userData.Email,Name:user.Name }, JWT_SECRET_KEY, { expiresIn: '1h' });
                       console.log("Login Success");
                       resolve({ status: true, token });   
                     } else { 
