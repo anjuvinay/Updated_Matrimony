@@ -42,17 +42,11 @@ function verifyToken(req, res, next) {
 
 
 /* GET home page. */
-// router.get('/',verifyLogin, async function(req, res, next) {
-//   let user=req.session.user
-//   let interestCount=null 
-//     interestCount=await profileHelpers.interest_count(user.Email)
-  
-//  profileHelpers.getVerifiedProfiles(user).then((profiles)=>{
- 
-//   res.render('user/view-profiles', {profiles,user,interestCount});
-//  })
-  
-// }); 
+router.get('/count', verifyToken, async function(req, res, next) {
+  let interestCount=null 
+    interestCount=await profileHelpers.interest_count(req.userEmail)
+    res.json({ "items":interestCount});  
+}); 
 
 router.get('/pro',verifyToken, async function(req, res, next) {
   const userEmail = req.userEmail;
@@ -68,24 +62,6 @@ router.get('/pro',verifyToken, async function(req, res, next) {
 
 router.post('/create-profile', verifyToken, (req,res)=>{
 profileHelpers.addProfile(req.body,(insertedId)=>{
-  
-//   let image1=req.files.image1
-//   let image2=req.files.image2
-//   let image3=req.files.image3
-
-//   image3.mv('./public/profile-images/'+insertedId+3+'.jpg')
-//   image2.mv('./public/profile-images/'+insertedId+2+'.jpg') 
-//   image1.mv('./public/profile-images/'+insertedId+1+'.jpg',(err,done)=>{
-    
-//     if(!err){
-//       console.log("No error")
-//     }else{
-//       console.log(err)
-//     }
-//   })
-  
-// })
-// })
 
 const uploadImage = (file, index) => {
   if (file) {
@@ -145,48 +121,39 @@ router.get('/view-profile/:id',verifyToken, (req,res)=>{
 })
 
 router.get('/send-interest-button', verifyToken, (req,res)=>{
-  let user=req.session.user
-  profileHelpers.intrest(req.session.user._id).then((profiles)=>{
-    console.log(profiles)
-    res.render('user/send-intrest',{profiles,user})
+  profileHelpers.intrest(req.Id).then((profiles)=>{
+    res.json({ "items":profiles});
   })
 
 })
 
 router.get('/interest', verifyToken, async(req,res)=>{
-  let user=req.session.user
-  let profile=await profileHelpers.verifyMyProfile(user.Email)
+  let profile=await profileHelpers.verifyMyProfile(req.userEmail)
   if(profile){
-    profileHelpers.interest_received(user.Email).then((profiles)=>{
-      res.render('user/received-interest',{profiles,user})
+    profileHelpers.interest_received(req.userEmail).then((profiles)=>{
+      res.json({ "items":profiles});
       })
   }else{
-    res.redirect('/create-profile')
+    res.json({ "items":null});
   } 
 
   })
 
 
-  router.get('/send-intrest/:id',verifyToken, async(req, res)=>{
-    let user=req.session.user
-    let proId=req.params.id
-    let profile=await profileHelpers.verifyMyProfile(user.Email)
-      console.log(profile)
-      if(profile){
-        res.render('user/interest-msg',{admin:false, user,proId})
-      }else{
-        res.redirect('/create-profile')
-      } 
+  // router.get('/send-intrest/:id',verifyToken, async(req, res)=>{
+  //   let user=req.session.user
+  //   let proId=req.params.id
+  //   let profile=await profileHelpers.verifyMyProfile(user.Email)
+  //     console.log(profile)
+  //     if(profile){
+  //       res.render('user/interest-msg',{admin:false, user,proId})
+  //     }else{
+  //       res.redirect('/create-profile')
+  //     } 
     
-    })
+  //   })
 
     
-  // router.post('/int-msg', verifyToken, (req, res)=>{
-  //     let user=req.session.user
-  //     profileHelpers.intrest_send(req.body, req.session.user._id, user.Email).then((profiles)=>{
-  //       res.redirect('/send-interest-button')
-  //   })
-  // })
 
   router.post('/int-msg/:id', verifyToken, async(req, res)=>{
     const userEmail = req.userEmail; 
@@ -197,9 +164,9 @@ router.get('/interest', verifyToken, async(req,res)=>{
   
 
 router.get('/cancel-intrest/:id', verifyToken, (req,res)=>{
-  let user=req.session.user
-  profileHelpers.delete_intrest(req.params.id, req.session.user._id,user)
-    res.redirect('/send-interest-button')   
+  profileHelpers.delete_intrest(req.params.id, req.Id, req.userEmail).then((response)=>{
+    res.json({ "deleteInterest":true });
+  }) 
 })
 
 
@@ -212,10 +179,7 @@ router.get('/my-profile',verifyToken,(req,res,next)=>{
 
 
 router.get('/edit-profile',verifyToken,async(req,res)=>{
-  
   let profile = await profileHelpers.myProfileDetails(req.userEmail)
-
-  console.log(profile)
   res.json({ "items":profile}); 
 })
 
@@ -252,41 +216,37 @@ router.get('/delete-profile', verifyToken,(req,res)=>{
 
 
 router.get('/matches', verifyToken, async(req,res)=>{
-  let user=req.session.user
-  let profile=await profileHelpers.verifyMyProfile(user.Email)
+  let profile=await profileHelpers.verifyMyProfile(req.userEmail)
   if(profile){
-    profileHelpers.getMatchingProfiles(user).then((profiles)=>{
-      res.render('user/matching-profiles',{profiles, admin:false, user})
-      })
-  }else{
-    res.redirect('/create-profile')
-  } 
+    profileHelpers.getMatchingProfiles(req.userEmail).then((profiles)=>{
+      res.json({ "items":profiles});
+    })
+}else{
+  res.json({ "items":null});
+} 
 })
 
 router.get('/accept-interest/:id', verifyToken, (req,res)=>{
-  let user=req.session.user
-  profileHelpers.interestAccepted(req.params.id, user.Email).then(()=>{
+  profileHelpers.interestAccepted(req.params.id, req.userEmail).then(()=>{
     res.json({status:true})  
   })
 })
 
 router.get('/decline-interest/:id', verifyToken, (req,res)=>{
-  let user=req.session.user
-  profileHelpers.interestDeclined(req.params.id, user.Email).then(()=>{
+  
+  profileHelpers.interestDeclined(req.params.id, req.userEmail).then(()=>{
     res.json({status:true})  
   })
 })
 
 router.get('/accepted-interest', verifyToken, async(req,res)=>{
-  let user=req.session.user
-  let profiles=await profileHelpers.accepted_profiles(user.Email)
-  res.render('user/accepted-interest',{user, profiles})
+  let profiles=await profileHelpers.accepted_profiles(req.userEmail)
+  res.json({ "items":profiles}); 
 })
 
 router.get('/declined-interest', verifyToken, async(req,res)=>{
-  let user=req.session.user
-  let profiles=await profileHelpers.declined_profiles(user.Email)
-  res.render('user/declined-interest',{user,profiles}) 
+  let profiles=await profileHelpers.declined_profiles(req.userEmail)
+  res.json({ "items":profiles}); 
 })
 
 

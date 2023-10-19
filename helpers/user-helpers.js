@@ -14,7 +14,6 @@ module.exports={
             const existingUser = await db.get().collection(collection.USER_COLLECTION).findOne({Email:userData.Email})
 
             if (existingUser) {
-            // return res.status(400).json({ message: 'Email already exists' });
             resolve(null)
             }else{
             db.get().collection(collection.USER_COLLECTION).insertOne(userData).then((data)=>{

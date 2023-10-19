@@ -45,11 +45,11 @@ module.exports={
         })
     },
 
-    getMatchingProfiles:(user)=>{
+    getMatchingProfiles:(email)=>{
         return new Promise(async(resolve,reject)=>{
-            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:user.Email})
+            let userProfile=await db.get().collection(collection.PROFILE_COLLECTION).findOne({email:email})
 
-            if(user.Gender=="Male"){
+            if(userProfile.gender=="Male"){
                 let matchedProfiles=await db.get().collection(collection.PROFILE_COLLECTION).aggregate([
                     {
                         $match:{
@@ -247,9 +247,9 @@ module.exports={
         })
     },
 
-    delete_intrest:(proId, userId, user)=>{
+    delete_intrest:(proId, userId, email)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({email:user.Email},
+            db.get().collection(collection.INTEREST_RECEIVED_COLLECTION).updateOne({email:email},
             {
                 $pull:{receivedDetails:{To:new ObjectId(proId)}}
             }
