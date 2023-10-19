@@ -3,70 +3,77 @@ var router = express.Router();
 var profileHelpers=require('../helpers/profile-helpers')
 const userHelpers=require('../helpers/user-helpers')
 const adminHelpers=require('../helpers/admin-helpers')
+const jwt = require('jsonwebtoken');
+const { token } = require('morgan');
+require('dotenv').config();
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-const verifyLogiin = (req, res, next)=>{
-  if(req.session.admin){
-    next()
-  }else{
-    res.redirect('/admin/log-in')
+router.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
+
+function verifyyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
+
+  const token = authHeader.split(' ')[1]; 
+
+
+  jwt.verify(token, JWT_SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid token' });
+    }
+    const userEmail = decoded.Email;
+    req.userEmail = userEmail;
+    const Id=decoded.userId; 
+    req.Id = Id
+    const userName=decoded.Name;
+    req.userName = userName;
+
+    next();
+  });
 }
 
 /* GET users listing. */
-router.get('/',verifyLogiin, function(req, res, next) { 
-  let Admin=req.session.admin
+router.get('/list',verifyyToken, function(req, res, next) { 
+  
   profileHelpers.getAllProfiles().then((profiles)=>{
-    res.render('admin/view-profiles',{admin:true,Admin, profiles});
+    res.json({ "items":profiles}); 
   }) 
 });
 
-router.get('/sign-up', function(req, res){
-  res.render('admin/sign-up',{admin:true})
-  })
   
   router.post('/sign-up', function(req, res){
     adminHelpers.doSign_up(req.body).then((response)=>{
-     req.session.admin=response
-     req.session.admin.loggedIn=true    
-      res.redirect('/admin')
-     
+      if(response===null){
+        res.json({ "result":false });
+      }
+      else{
+        res.json({ "result":true });
+      } 
     })
    })
 
-   router.get('/log-in',(req,res)=>{
-    if(req.session.admin){
-      res.redirect('/')
-    }else{
-      res.render('admin/log-in',{"loginErr":req.session.loginErr,admin:true})
-      req.session.loginErr=false
-    }
-   })
   
    router.post('/log-in',(req, res)=>{  
     adminHelpers.doLog_in(req.body).then((response)=>{  
-      if(response.status){ 
-        req.session.admin=response.admin
-        req.session.admin.loggedIn=true
-       
-    res.redirect('/admin')
-      }else{
-        req.session.loginErr="Invalid username or Password"
-        res.redirect('/admin/log-in')
+      if(response.status===true){ 
+        res.json({ logged: true, token: response.token });
       }
-     
+      else{
+        res.json({ logged: false });
+      }  
   })
   })
   
-  router.get('/log-out',(req,res)=>{
-    req.session.admin=null
-    req.session.adminLoggedIn=false
-    res.redirect('/admin/log-in')
-  })
 
   router.get('/verify-status/:id',(req,res)=>{
     adminHelpers.verifiedStatus(req.params.id).then(()=>{
-      console.log(req.params.id)
-      res.redirect('/admin')
+      res.json({status:true})  
     })
   })
   

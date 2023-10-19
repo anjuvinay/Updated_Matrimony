@@ -138,29 +138,20 @@ router.get('/interest', verifyToken, async(req,res)=>{
   } 
 
   })
-
-
-  // router.get('/send-intrest/:id',verifyToken, async(req, res)=>{
-  //   let user=req.session.user
-  //   let proId=req.params.id
-  //   let profile=await profileHelpers.verifyMyProfile(user.Email)
-  //     console.log(profile)
-  //     if(profile){
-  //       res.render('user/interest-msg',{admin:false, user,proId})
-  //     }else{
-  //       res.redirect('/create-profile')
-  //     } 
-    
-  //   })
-
     
 
   router.post('/int-msg/:id', verifyToken, async(req, res)=>{
     const userEmail = req.userEmail; 
+    let profile=await profileHelpers.verifyMyProfile(userEmail)
+    console.log(profile)
+    if(profile){
     await profileHelpers.intrest_send(req.body, req.params.id, req.Id, userEmail).then((profiles)=>{
       res.json({ "sendInterest":true });
-  })
-})
+    })
+     }else{
+      res.json({ "sendInterest":false });
+     }
+    })
   
 
 router.get('/cancel-intrest/:id', verifyToken, (req,res)=>{

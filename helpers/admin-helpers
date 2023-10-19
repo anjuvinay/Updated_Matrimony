@@ -5,6 +5,10 @@ const { ADMIN_COLLECTION } = require('../config/collections')
 const { response } = require('../app')
 var ObjectId = require('mongodb').ObjectId
 const { resolve } = require('path')
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+
 
 
 module.exports={
@@ -19,22 +23,24 @@ module.exports={
         }) 
 
     },
+
     doLog_in:(adminData)=>{
         return new Promise(async(resolve, reject)=>{
-            let loginStatus=false
-            let response={}
+           
             let admin=await db.get().collection(collection.ADMIN_COLLECTION).findOne({Email:adminData.Email})
             if(admin){
                 bcrypt.compare(adminData.Password, admin.Password).then((status)=>{
+                    
                     if(status){
-                        console.log("Login Success")
-                        response.admin=admin
-                        response.status=true
-                        resolve(response)
-                    }else{
-                        console.log("Login Failed")
-                        resolve({status:false})
-                    }
+                        const token = jwt.sign({ userId:admin._id,Email:adminData.Email,Name:admin.Name }, JWT_SECRET_KEY, { expiresIn: '2h' });
+                        console.log("Login Success");
+                        resolve({ status: true, token });   
+                        
+                      } else { 
+                         console.log("Login Failed");    
+                         resolve({ status: false });
+                      }
+     
                 })
 
             }else{
@@ -52,7 +58,7 @@ module.exports={
                     status:'Verified'
                 }
             }).then(()=>{
-                resolve()
+                resolve({status:true})
             })
         })
     }
